@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serra Intelligente | Controllo Automatizzato</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2E8B57;
+            --primary-light: #5DBE7E;
+            --secondary: #1E4D40;
+            --accent: #FFA630;
+            --danger: #FF5A5F;
+            --light: #F5FDF9;
+            --dark: #1A2E28;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #F0FAF5 0%, #E0F5EC 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: white;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--secondary);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .mode-switch {
+            display: flex;
+            background: var(--light);
+            border-radius: 50px;
+            padding: 0.3rem;
+            gap: 0.3rem;
+        }
+
+        .mode-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            transition: var(--transition);
+        }
+
+        .mode-btn.active {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: var(--primary);
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .greenhouse-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-title svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .environment-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .env-card {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .env-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .env-card.warning::after {
+            background: var(--danger);
+            transform: scaleX(1);
+        }
+
+        .env-card.optimal::after {
+            transform: scaleX(1);
+        }
+
+        .env-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .env-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .env-label {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .control-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .control-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .control-card.active {
+            border-color: var(--primary);
+            background: var(--light);
+        }
+
+        .control-card.active .control-icon {
+            animation: pulse 1.5s infinite;
+        }
+
+        .control-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: var(--secondary);
+            text-align: center;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            background: #E8F5EE;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .status.off {
+            background: #F5F5F5;
+            color: #888;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            height: 100%;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300"><path d="M20,280 L50,220 L80,240 L110,180 L140,200 L170,150 L200,170 L230,120 L260,140 L290,90 L320,110 L350,60 L380,80" fill="none" stroke="%232E8B57" stroke-width="3" stroke-linecap="round"/><path d="M20,280 L50,220 L80,240 L110,180 L140,200 L170,150 L200,170 L230,120 L260,140 L290,90 L320,110 L350,60 L380,80" fill="url(%23gradient)" opacity="0.2"/><defs><linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="%232E8B57"/><stop offset="100%" stop-color="%23F5FDF9"/></linearGradient></defs></svg>') center no-repeat;
+            background-size: contain;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 10px rgba(255, 166, 48, 0.5)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(255, 166, 48, 0.8)); }
+        }
+
+        /* Icon animations */
+        .sun-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .sun-rays {
+            animation: rotate 20s linear infinite;
+        }
+
+        .water-drop {
+            animation: float 4s 0.5s ease-in-out infinite;
+        }
+
+        .plant-icon {
+            animation: float 5s 0.2s ease-in-out infinite;
+        }
+
+        .fan-blades {
+            animation: rotate 1.5s linear infinite;
+            transform-origin: center;
+        }
+
+        .light-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .pump-waves {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .environment-display, .controls-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            main {
+                padding: 1rem;
+            }
+            
+            .greenhouse-section, .chart-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L3 10l3 3v7a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7l3-3-9-8z"></path>
+                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+                </svg>
+            </div>
+            <span>Serra Intelligente</span>
+        </div>
+        
+        <div class="mode-switch">
+            <button class="mode-btn active">Automatico</button>
+            <button class="mode-btn">Manuale</button>
+        </div>
+    </header>
+    
+    <main>
+        <div class="dashboard">
+            <div class="greenhouse-section">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L3 10l3 3v7a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7l3-3-9-8z"></path>
+                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+                    </svg>
+                    Ambiente Serra
+                </h2>
+                
+                <div class="environment-display">
+                    <div class="env-card optimal">
+                        <div class="env-icon">
+                            <svg class="sun-icon" width="60" height="60" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="25" fill="var(--accent)"/>
+                                <g class="sun-rays" style="transform-origin: 50% 50%">
+                                    <circle cx="50" cy="15" r="5" fill="var(--accent)" opacity="0.8"/>
+                                    <circle cx="85" cy="50" r="5" fill="var(--accent)" opacity="0.8"/>
+                                    <circle cx="50" cy="85" r="5" fill="var(--accent)" opacity="0.8"/>
+                                    <circle cx="15" cy="50" r="5" fill="var(--accent)" opacity="0.8"/>
+                                    <circle cx="70" cy="30" r="4" fill="var(--accent)" opacity="0.7"/>
+                                    <circle cx="30" cy="70" r="4" fill="var(--accent)" opacity="0.7"/>
+                                    <circle cx="70" cy="70" r="4" fill="var(--accent)" opacity="0.7"/>
+                                    <circle cx="30" cy="30" r="4" fill="var(--accent)" opacity="0.7"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="env-value">24°C</div>
+                        <div class="env-label">Temperatura</div>
+                    </div>
+                    
+                    <div class="env-card optimal">
+                        <div class="env-icon">
+                            <svg class="water-drop" width="60" height="60" viewBox="0 0 100 100">
+                                <path d="M50 20Q55 30 50 40Q45 30 50 20" fill="#4CC9F0"/>
+                                <path d="M50 40Q55 50 50 60Q45 50 50 40" fill="#4CC9F0" opacity="0.8"/>
+                                <circle cx="50" cy="70" r="15" fill="#4CC9F0" opacity="0.2"/>
+                            </svg>
+                        </div>
+                        <div class="env-value">65%</div>
+                        <div class="env-label">Umidità</div>
+                    </div>
+                    
+                    <div class="env-card">
+                        <div class="env-icon">
+                            <svg class="plant-icon" width="60" height="60" viewBox="0 0 100 100">
+                                <path d="M50 80L50 40" stroke="var(--primary)" stroke-width="4" stroke-linecap="round"/>
+                                <path d="M50 40Q40 30 35 35Q40 40 50 45Q60 40 65 35Q60 30 50 40" fill="var(--primary-light)"/>
+                                <path d="M50 45Q45 50 50 55Q55 50 50 45" fill="var(--accent)"/>
+                            </svg>
+                        </div>
+                        <div class="env-value">Buono</div>
+                        <div class="env-label">Stato Piante</div>
+                    </div>
+                    
+                    <div class="env-card warning">
+                        <div class="env-icon">
+                            <svg width="60" height="60" viewBox="0 0 100 100">
+                                <path d="M50 10L90 90H10L50 10Z" fill="var(--danger)" opacity="0.2" stroke="var(--danger)" stroke-width="2"/>
+                                <path d="M50 35V55M50 65V65" stroke="var(--danger)" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="env-value">3.2</div>
+                        <div class="env-label">pH Terreno</div>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Controlli
+                </h2>
+                
+                <div class="controls-grid">
+                    <div class="control-card">
+                        <div class="control-icon">
+                            <svg width="80" height="80" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="35" fill="var(--light)" stroke="var(--secondary)" stroke-width="2"/>
+                                <g class="fan-blades">
+                                    <path d="M50 15L55 20L50 25" fill="var(--secondary)"/>
+                                    <path d="M85 50L80 55L75 50" fill="var(--secondary)"/>
+                                    <path d="M50 85L55 80L50 75" fill="var(--secondary)"/>
+                                    <path d="M15 50L20 55L25 50" fill="var(--secondary)"/>
+                                </g>
+                                <circle cx="50" cy="50" r="10" fill="var(--accent)"/>
+                            </svg>
+                        </div>
+                        <div class="control-label">Ventilazione</div>
+                        <div class="status off">OFF</div>
+                    </div>
+                    
+                    <div class="control-card active">
+                        <div class="control-icon">
+                            <svg width="80" height="80" viewBox="0 0 100 100">
+                                <path class="light-glow" d="M50 20Q60 15 70 25Q65 40 50 50Q35 40 30 25Q40 15 50 20" fill="var(--accent)"/>
+                                <rect x="45" y="50" width="10" height="15" rx="2" fill="var(--secondary)"/>
+                                <path d="M50 30Q55 35 50 40Q45 35 50 30" fill="white" opacity="0.9"/>
+                            </svg>
+                        </div>
+                        <div class="control-label">Illuminazione</div>
+                        <div class="status">ON</div>
+                    </div>
+                    
+                    <div class="control-card">
+                        <div class="control-icon">
+                            <svg width="80" height="80" viewBox="0 0 100 100">
+                                <rect x="30" y="40" width="40" height="30" rx="5" fill="var(--primary)"/>
+                                <circle cx="65" cy="55" r="10" fill="var(--secondary)"/>
+                                <rect x="65" y="50" width="15" height="10" fill="var(--secondary)"/>
+                                <path d="M30 55L20 55L15 50L15 60L20 55" fill="var(--secondary)"/>
+                                <circle cx="50" cy="55" r="5" fill="var(--light)"/>
+                                <path d="M50 50L50 60M45 55L55 55" stroke="var(--light)" stroke-width="2"/>
+                                <g class="pump-waves">
+                                    <circle cx="20" cy="55" r="3" fill="none" stroke="var(--primary-light)" stroke-width="2" opacity="0">
+                                        <animate attributeName="r" values="3;8" dur="1.5s" repeatCount="indefinite"/>
+                                        <animate attributeName="opacity" values="0.5;0" dur="1.5s" repeatCount="indefinite"/>
+                                    </circle>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="control-label">Irrigazione</div>
+                        <div class="status off">OFF</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21H3v-2h18v2zM8 13v5H4v-5h4zm6-4v9h-4V9h4zm6-3v12h-4V6h4z"></path>
+                    </svg>
+                    Andamento Ambientale
+                </h2>
+                <div class="chart-placeholder"></div>
+                <!-- Qui andrà il grafico reale con Chart.js o similari -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simulazione interattiva
+        document.addEventListener('DOMContentLoaded', function() {
+            const controlCards = document.querySelectorAll('.control-card');
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            
+            // Gestione click sui controlli
+            controlCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const status = this.querySelector('.status');
+                    this.classList.toggle('active');
+                    
+                    if(this.classList.contains('active')) {
+                        status.textContent = 'ON';
+                        status.classList.remove('off');
+                    } else {
+                        status.textContent = 'OFF';
+                        status.classList.add('off');
+                    }
+                });
+            });
+            
+            // Gestione cambio modalità
+            modeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modeButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Qui implementeresti la logica per cambiare modalità
+                });
+            });
+            
+            // Simulazione dati ambientali
+            function simulateEnvironment() {
+                const tempElement = document.querySelector('.env-card:nth-child(1) .env-value');
+                const humidityElement = document.querySelector('.env-card:nth-child(2) .env-value');
+                const phElement = document.querySelector('.env-card:nth-child(4)');
+                
+                // Variazione casuale dei valori
+                const randomTemp = (24 + (Math.random() * 2 - 1)).toFixed(1);
+                const randomHumidity = (65 + (Math.random() * 10 - 5)).toFixed(0);
+                const randomPH = (3.2 + (Math.random() * 0.4 - 0.2)).toFixed(1);
+                
+                tempElement.textContent = `${randomTemp}°C`;
+                humidityElement.textContent = `${randomHumidity}%`;
+                phElement.querySelector('.env-value').textContent = randomPH;
+                
+                // Cambia stato in base ai valori
+                if(randomPH > 3.5) {
+                    phElement.classList.remove('warning');
+                    phElement.classList.add('optimal');
+                } else {
+                    phElement.classList.remove('optimal');
+                    phElement.classList.add('warning');
+                }
+                
+                setTimeout(simulateEnvironment, 3000);
+            }
+            
+            simulateEnvironment();
+        });
+    </script>
+</body>
+</html>
