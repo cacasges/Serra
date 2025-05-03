@@ -601,6 +601,43 @@
             transform: scale(1.05);
         }
 
+        /* Plant Selection */
+        .plant-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .plant-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background: var(--surface);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .plant-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .plant-option.selected {
+            background: rgba(46, 125, 50, 0.1);
+            border: 2px solid var(--primary);
+        }
+
+        .plant-option-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .dashboard {
@@ -696,8 +733,8 @@
                 <div class="weather-card">
                     <span class="material-icons-round weather-icon">wb_sunny</span>
                     <div class="weather-details">
-                        <h3 class="weather-temp">28°C</h3>
-                        <p class="weather-desc">Sereno</p>
+                        <h3 class="weather-temp" id="current-temp">28°C</h3>
+                        <p class="weather-desc" id="weather-desc">Sereno</p>
                         <div class="weather-meta">
                             <span class="weather-meta-item">
                                 <span class="material-icons-round">water_drop</span>
@@ -738,12 +775,12 @@
                 
                 <div class="plant-status">
                     <span class="material-icons-round plant-icon">spa</span>
-                    <h3 class="plant-name">Basilico Genovese</h3>
-                    <p class="plant-variety">Ocimum basilicum</p>
+                    <h3 class="plant-name" id="current-plant">Basilico Genovese</h3>
+                    <p class="plant-variety" id="plant-variety">Ocimum basilicum</p>
                     
                     <div class="plant-health">
                         <span class="material-icons-round health-icon health-ok">mood</span>
-                        <span>Stato di salute: Eccellente</span>
+                        <span id="plant-health-status">Stato di salute: Eccellente</span>
                     </div>
                     
                     <div class="chart-container">
@@ -759,6 +796,11 @@
                             <p>La temperatura ha superato i 30°C, attivare la ventilazione</p>
                         </div>
                     </div>
+                </div>
+                
+                <h4 style="margin-top: 20px;">Seleziona Pianta</h4>
+                <div class="plant-selection" id="plant-selection">
+                    <!-- Popolato via JavaScript -->
                 </div>
             </div>
             
@@ -838,12 +880,146 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Database delle piante
+        const plantsDatabase = [
+            {
+                name: "Basilico Genovese",
+                scientific: "Ocimum basilicum",
+                type: "erba aromatica",
+                temp: { min: 18, max: 28 },
+                humidity: { min: 50, max: 70 },
+                soil: { min: 60, max: 80 },
+                light: { min: 6000, max: 12000 },
+                water: "moderata",
+                icon: "grass",
+                description: "Il re delle erbe aromatiche italiane, perfetto per pesto e insalate."
+            },
+            {
+                name: "Pomodoro San Marzano",
+                scientific: "Solanum lycopersicum",
+                type: "ortaggio",
+                temp: { min: 20, max: 30 },
+                humidity: { min: 50, max: 70 },
+                soil: { min: 60, max: 80 },
+                light: { min: 8000, max: 15000 },
+                water: "abbondante",
+                icon: "yard",
+                description: "Il celebre pomodoro per sughi, richiede sostegni e potature."
+            },
+            {
+                name: "Fragraria",
+                scientific: "Fragaria × ananassa",
+                type: "frutto",
+                temp: { min: 15, max: 25 },
+                humidity: { min: 60, max: 75 },
+                soil: { min: 65, max: 85 },
+                light: { min: 7000, max: 12000 },
+                water: "regolare",
+                icon: "local_florist",
+                description: "Deliziose fragole che richiedono spazio per i corridori."
+            },
+            {
+                name: "Rosmarino",
+                scientific: "Salvia rosmarinus",
+                type: "erba aromatica",
+                temp: { min: 10, max: 30 },
+                humidity: { min: 40, max: 60 },
+                soil: { min: 40, max: 70 },
+                light: { min: 7000, max: 14000 },
+                water: "scarsa",
+                icon: "filter_vintage",
+                description: "Robusto e resistente, perfetto per arrosti e oli aromatici."
+            },
+            {
+                name: "Lattuga Romana",
+                scientific: "Lactuca sativa",
+                type: "ortaggio",
+                temp: { min: 12, max: 22 },
+                humidity: { min: 60, max: 80 },
+                soil: { min: 70, max: 90 },
+                light: { min: 5000, max: 10000 },
+                water: "abbondante",
+                icon: "eco",
+                description: "A crescita rapida, ideale per insalate fresche."
+            },
+            {
+                name: "Menta Piperita",
+                scientific: "Mentha × piperita",
+                type: "erba aromatica",
+                temp: { min: 15, max: 25 },
+                humidity: { min: 60, max: 75 },
+                soil: { min: 70, max: 90 },
+                light: { min: 5000, max: 10000 },
+                water: "abbondante",
+                icon: "spa",
+                description: "Invadente ma deliziosa per tè e cocktail."
+            },
+            {
+                name: "Peperoncino Calabrese",
+                scientific: "Capsicum annuum",
+                type: "ortaggio",
+                temp: { min: 20, max: 32 },
+                humidity: { min: 50, max: 70 },
+                soil: { min: 60, max: 80 },
+                light: { min: 9000, max: 15000 },
+                water: "moderata",
+                icon: "whatshot",
+                description: "Piccante e vigoroso, ama il caldo e il sole."
+            },
+            {
+                name: "Zucchino Nero",
+                scientific: "Cucurbita pepo",
+                type: "ortaggio",
+                temp: { min: 18, max: 28 },
+                humidity: { min: 60, max: 75 },
+                soil: { min: 70, max: 90 },
+                light: { min: 8000, max: 14000 },
+                water: "abbondante",
+                icon: "park",
+                description: "Produttivo, richiede spazio per le grandi foglie."
+            },
+            {
+                name: "Limone",
+                scientific: "Citrus limon",
+                type: "albero da frutto",
+                temp: { min: 12, max: 28 },
+                humidity: { min: 50, max: 70 },
+                soil: { min: 60, max: 80 },
+                light: { min: 10000, max: 15000 },
+                water: "moderata",
+                icon: "forest",
+                description: "Alberello che necessita di potature e concimazioni regolari."
+            },
+            {
+                name: "Melanzana Violetta",
+                scientific: "Solanum melongena",
+                type: "ortaggio",
+                temp: { min: 20, max: 30 },
+                humidity: { min: 55, max: 75 },
+                soil: { min: 65, max: 85 },
+                light: { min: 9000, max: 14000 },
+                water: "regolare",
+                icon: "emoji_nature",
+                description: "Delicata ma gratificante, ottima per parmigiana e conserve."
+            }
+        ];
+
         // Configurazione
+        const WEATHER_API_KEY = "3222d6d63ef2437780b182634250305";
         const GROQ_API_KEY = "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";
         const GROQ_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
+        const LOCATION = "Belpasso";
         
+        // Stato applicazione
+        let currentPlant = plantsDatabase[0];
+        let chatHistory = [
+            {
+                role: "system",
+                content: "Tu sei una Serra Intelligente, parli solo italiano, sei gentile e dolce, aggiungi degli emoticon verdi, sei concisa e decisa. conosci ogni tipo di pianta e frutta in natura. Non puoi parlare di argomenti che escono troppo fuori dalla natura. Devi saperne di ventilazione per serre, temperatura, umidità, irrigazione, luci led eccetera eccetera, per non far seccare o ammalare il raccolto, è importantissimo che tu faccia attenzione. Devi saperne anche di energia autogestita, di pannelli solari, inverter, batterie. Devi conoscere ogni caratteristica di frutta e verdura. Devi conoscere rarità e prezzi. E ricorda che sei la serra del tuo utente, ti devi occupare di tenere tutto pulito ed in funzione."
+            }
+        ];
+
         // Inizializzazione grafici
         const internalCtx = document.getElementById('internal-chart').getContext('2d');
         const plantCtx = document.getElementById('plant-chart').getContext('2d');
@@ -943,39 +1119,152 @@
             }
         });
         
-        // Popola previsioni meteo (dati simulati)
-        function populateWeatherForecast() {
-            const hourlyContainer = document.getElementById('hourly-forecast');
-            const dailyContainer = document.getElementById('daily-forecast');
+        // Popola selezione piante
+        function populatePlantSelection() {
+            const container = document.getElementById('plant-selection');
+            container.innerHTML = plantsDatabase.map(plant => `
+                <div class="plant-option ${plant.name === currentPlant.name ? 'selected' : ''}" 
+                     data-name="${plant.name}" onclick="selectPlant('${plant.name}')">
+                    <span class="material-icons-round plant-option-icon">${plant.icon}</span>
+                    <h4>${plant.name}</h4>
+                    <p>${plant.type}</p>
+                </div>
+            `).join('');
+        }
+        
+        // Seleziona pianta
+        function selectPlant(plantName) {
+            currentPlant = plantsDatabase.find(p => p.name === plantName);
+            document.getElementById('current-plant').textContent = currentPlant.name;
+            document.getElementById('plant-variety').textContent = currentPlant.scientific;
             
-            // Previsioni orarie
-            hourlyContainer.innerHTML = Array.from({length: 12}, (_, i) => {
-                const hour = new Date();
-                hour.setHours(hour.getHours() + i);
-                const temp = Math.floor(Math.random() * 5) + 25;
-                const rain = Math.random() > 0.7 ? Math.floor(Math.random() * 30) : 0;
+            // Aggiorna grafico pianta con dati casuali
+            plantChart.data.datasets[1].data = Array.from({length: 7}, () => 
+                Math.floor(Math.random() * 15) + 70
+            );
+            plantChart.update();
+            
+            // Aggiorna selezione
+            document.querySelectorAll('.plant-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.name === plantName);
+            });
+            
+            // Aggiungi messaggio al chatbot
+            addBotMessage(`🌱 Ho cambiato la pianta in ${currentPlant.name}. ${currentPlant.description} 
+                Ricorda che preferisce temperature tra ${currentPlant.temp.min}°C e ${currentPlant.temp.max}°C 
+                e umidità del terreno tra ${currentPlant.soil.min}% e ${currentPlant.soil.max}%.`);
+        }
+        
+        // Popola previsioni meteo
+        async function fetchWeatherData() {
+            try {
+                // Usa un proxy CORS per evitare problemi
+                const proxyUrl = 'https://api.allorigins.win/get?url=';
+                const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${LOCATION}&days=3&lang=it`;
                 
+                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+                const data = await response.json();
+                
+                if (data.contents) {
+                    const weatherData = JSON.parse(data.contents);
+                    updateWeatherUI(weatherData);
+                } else {
+                    console.error("Dati meteo non ricevuti:", data);
+                    // Usa dati simulati in caso di errore
+                    simulateWeatherData();
+                }
+            } catch (error) {
+                console.error("Errore nel recupero dati meteo:", error);
+                simulateWeatherData();
+            }
+        }
+        
+        function updateWeatherUI(weatherData) {
+            const current = weatherData.current;
+            const forecast = weatherData.forecast.forecastday[0];
+            
+            // Aggiorna dati correnti
+            document.getElementById('current-temp').textContent = `${current.temp_c}°C`;
+            document.getElementById('weather-desc').textContent = current.condition.text;
+            document.getElementById('weather-humidity').textContent = `${current.humidity}%`;
+            document.getElementById('weather-wind').textContent = `${current.wind_kph} km/h`;
+            document.getElementById('weather-rain').textContent = forecast.day.daily_chance_of_rain > 0 ? 
+                `${forecast.day.daily_chance_of_rain}%` : '0 mm';
+            
+            // Aggiorna stato esterno
+            const externalStatus = document.getElementById('external-status');
+            if (forecast.day.daily_chance_of_rain > 50) {
+                externalStatus.textContent = "Pioggia";
+                externalStatus.className = "status-badge status-warning";
+            } else if (current.temp_c > 30) {
+                externalStatus.textContent = "Caldo";
+                externalStatus.className = "status-badge status-danger";
+            } else {
+                externalStatus.textContent = "Sereno";
+                externalStatus.className = "status-badge status-ok";
+            }
+            
+            // Aggiorna previsioni orarie
+            const hourlyContainer = document.getElementById('hourly-forecast');
+            hourlyContainer.innerHTML = forecast.hour.slice(0, 12).map(hour => {
+                const time = new Date(hour.time);
                 return `
                     <div class="hourly-item">
-                        <p><strong>${hour.getHours()}:00</strong></p>
-                        <p>${temp}°C</p>
-                        <p>💧 ${Math.floor(Math.random() * 20) + 50}%</p>
-                        ${rain > 0 ? `<p>☔ ${rain}%</p>` : ''}
+                        <p><strong>${time.getHours()}:00</strong></p>
+                        <p>${hour.temp_c}°C</p>
+                        <p>💧 ${hour.humidity}%</p>
+                        ${hour.chance_of_rain > 0 ? `<p>☔ ${hour.chance_of_rain}%</p>` : ''}
                     </div>
                 `;
             }).join('');
             
-            // Previsioni giornaliere
-            dailyContainer.innerHTML = Array.from({length: 5}, (_, i) => {
+            // Aggiorna previsioni giornaliere
+            const dailyContainer = document.getElementById('daily-forecast');
+            dailyContainer.innerHTML = weatherData.forecast.forecastday.map(day => {
+                const date = new Date(day.date);
+                const dayNames = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+                return `
+                    <div class="daily-item">
+                        <p><strong>${dayNames[date.getDay()]}</strong></p>
+                        <p>${day.day.maxtemp_c}°C</p>
+                        <p>${day.day.mintemp_c}°C 🌙</p>
+                        <p>💧 ${day.day.avghumidity}%</p>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function simulateWeatherData() {
+            // Dati simulati per quando l'API non funziona
+            document.getElementById('current-temp').textContent = `${Math.floor(Math.random() * 10) + 20}°C`;
+            document.getElementById('weather-desc').textContent = "Sereno";
+            document.getElementById('weather-humidity').textContent = `${Math.floor(Math.random() * 30) + 50}%`;
+            document.getElementById('weather-wind').textContent = `${Math.floor(Math.random() * 20)} km/h`;
+            document.getElementById('weather-rain').textContent = "0 mm";
+            
+            const hourlyContainer = document.getElementById('hourly-forecast');
+            hourlyContainer.innerHTML = Array.from({length: 12}, (_, i) => {
+                const hour = new Date();
+                hour.setHours(hour.getHours() + i);
+                return `
+                    <div class="hourly-item">
+                        <p><strong>${hour.getHours()}:00</strong></p>
+                        <p>${Math.floor(Math.random() * 5) + 22}°C</p>
+                        <p>💧 ${Math.floor(Math.random() * 20) + 50}%</p>
+                    </div>
+                `;
+            }).join('');
+            
+            const dailyContainer = document.getElementById('daily-forecast');
+            dailyContainer.innerHTML = Array.from({length: 3}, (_, i) => {
                 const day = new Date();
                 day.setDate(day.getDate() + i);
                 const dayNames = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
-                
                 return `
                     <div class="daily-item">
                         <p><strong>${dayNames[day.getDay()]}</strong></p>
-                        <p>${Math.floor(Math.random() * 5) + 24}°C</p>
-                        <p>${Math.floor(Math.random() * 5) + 18}°C 🌙</p>
+                        <p>${Math.floor(Math.random() * 5) + 22}°C</p>
+                        <p>${Math.floor(Math.random() * 5) + 16}°C 🌙</p>
                         <p>💧 ${Math.floor(Math.random() * 20) + 50}%</p>
                     </div>
                 `;
@@ -987,6 +1276,16 @@
         document.getElementById('chatbot-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
+        
+        function addBotMessage(message) {
+            const messagesContainer = document.getElementById('chatbot-messages');
+            messagesContainer.innerHTML += `
+                <div class="message bot-message">
+                    ${message}
+                </div>
+            `;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
         
         async function sendMessage() {
             const input = document.getElementById('chatbot-input');
@@ -1005,11 +1304,15 @@
             input.value = '';
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
+            // Aggiungi al contesto
+            chatHistory.push({ role: "user", content: message });
+            
             // Mostra indicatori di caricamento
             const loadingId = 'loading-' + Date.now();
             messagesContainer.innerHTML += `
                 <div id="${loadingId}" class="message bot-message">
-                    <span class="loading" style="display: inline-block;"></span> Sto pensando...
+                    <span style="display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,.3); border-radius: 50%; border-top-color: #4CAF50; animation: spin 1s ease-in-out infinite; margin-right: 10px;"></span>
+                    Sto pensando...
                 </div>
             `;
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -1024,16 +1327,7 @@
                     },
                     body: JSON.stringify({
                         model: GROQ_MODEL,
-                        messages: [
-                            {
-                                role: "system",
-                                content: "Tu sei una Serra Intelligente, parli solo italiano, sei gentile e dolce, aggiungi degli emoticon verdi, sei concisa e decisa. conosci ogni tipo di pianta e frutta in natura. Non puoi parlare di argomenti che escono troppo fuori dalla natura. Devi saperne di ventilazione per serre, temperatura, umidità, irrigazione, luci led eccetera eccetera, per non far seccare o ammalare il raccolto, è importantissimo che tu faccia attenzione. Devi saperne anche di energia autogestita, di pannelli solari, inverter, batterie. Devi conoscere ogni caratteristica di frutta e verdura. Devi conoscere rarità e prezzi. E ricorda che sei la serra del tuo utente, ti devi occupare di tenere tutto pulito ed in funzione."
-                            },
-                            {
-                                role: "user",
-                                content: message
-                            }
-                        ],
+                        messages: chatHistory,
                         temperature: 0.7,
                         max_tokens: 500
                     })
@@ -1041,6 +1335,9 @@
                 
                 const data = await response.json();
                 const botResponse = data.choices[0].message.content;
+                
+                // Aggiungi al contesto
+                chatHistory.push({ role: "assistant", content: botResponse });
                 
                 // Sostituisci il messaggio di caricamento con la risposta
                 document.getElementById(loadingId).outerHTML = `
@@ -1053,7 +1350,7 @@
                 console.error("Errore chatbot:", error);
                 document.getElementById(loadingId).outerHTML = `
                     <div class="message bot-message">
-                        ⚠️ Si è verificato un errore. Riprova più tardi.
+                        ⚠️ Mi dispiace, al momento non posso rispondere. Prova più tardi o contattami su Telegram.
                     </div>
                 `;
             }
@@ -1061,16 +1358,56 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
+        // Simula dati sensori in tempo reale
+        function simulateSensorData() {
+            setInterval(() => {
+                const temp = (Math.random() * 2 + 23.5).toFixed(1);
+                const humidity = Math.floor(Math.random() * 10 + 60);
+                const soil = Math.floor(Math.random() * 10 + 65);
+                const light = Math.floor(Math.random() * 2000 + 7000);
+                
+                document.getElementById('internal-temp').textContent = temp;
+                document.getElementById('internal-humidity').textContent = humidity;
+                document.getElementById('internal-soil').textContent = soil;
+                document.getElementById('internal-light').textContent = light;
+                
+                // Aggiorna stato interno
+                const statusElement = document.getElementById('internal-status');
+                if (temp > currentPlant.temp.max || temp < currentPlant.temp.min) {
+                    statusElement.textContent = "Attenzione";
+                    statusElement.className = "status-badge status-warning";
+                } else if (soil < currentPlant.soil.min) {
+                    statusElement.textContent = "Irrigare";
+                    statusElement.className = "status-badge status-danger";
+                } else {
+                    statusElement.textContent = "Ottimale";
+                    statusElement.className = "status-badge status-ok";
+                }
+                
+                // Aggiorna grafico con nuovi dati
+                internalChart.data.datasets[0].data.shift();
+                internalChart.data.datasets[0].data.push(temp);
+                internalChart.data.datasets[1].data.shift();
+                internalChart.data.datasets[1].data.push(humidity);
+                internalChart.update();
+                
+            }, 5000);
+        }
+        
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', () => {
-            populateWeatherForecast();
+            populatePlantSelection();
+            fetchWeatherData();
+            simulateSensorData();
             
-            // Simula dati sensori in tempo reale
-            setInterval(() => {
-                document.getElementById('internal-temp').textContent = (Math.random() * 2 + 23.5).toFixed(1);
-                document.getElementById('internal-humidity').textContent = Math.floor(Math.random() * 10 + 60);
-                document.getElementById('internal-soil').textContent = Math.floor(Math.random() * 10 + 65);
-                document.getElementById('internal-light').textContent = Math.floor(Math.random() * 2000 + 7000);
-            }, 5000);
-            
-            // Gestione pulsanti
+            // Aggiungi messaggio iniziale del chatbot con info sulla pianta
+            addBotMessage(`🌱 Attualmente stai coltivando ${currentPlant.name}. ${currentPlant.description} 
+                Ricorda che preferisce temperature tra ${currentPlant.temp.min}°C e ${currentPlant.temp.max}°C 
+                e umidità del terreno tra ${currentPlant.soil.min}% e ${currentPlant.soil.max}%.`);
+        });
+
+        // Esponi funzioni globali
+        window.selectPlant = selectPlant;
+    </script>
+</body>
+</html>
