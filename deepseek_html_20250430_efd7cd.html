@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌿 Serra Intelligente | Belpasso</title>
+    <title>Serra Intelligente | Belpasso</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,308 +13,668 @@
         :root {
             --primary: #2E7D32;
             --primary-light: #60AD5E;
+            --primary-dark: #1B5E20;
             --secondary: #FFC107;
-            --dark: #263238;
-            --light: #ECEFF1;
-            --danger: #D32F2F;
-            --warning: #FFA000;
+            --secondary-dark: #FFA000;
+            --background: #F5F7FA;
+            --surface: #FFFFFF;
+            --error: #D32F2F;
+            --on-primary: #FFFFFF;
+            --on-secondary: #212121;
+            --on-surface: #212121;
+            --on-background: #212121;
         }
-        
-        body {
-            font-family: 'Roboto', sans-serif;
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #f5f7fa;
-            color: var(--dark);
         }
-        
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--on-background);
+            line-height: 1.6;
+        }
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
+        /* Header */
         header {
             background-color: var(--primary);
-            color: white;
+            color: var(--on-primary);
             padding: 20px 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
+
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 20px;
         }
-        
-        h1 {
-            margin: 0;
-            font-weight: 500;
+
+        .logo {
             display: flex;
             align-items: center;
+            gap: 15px;
         }
-        
-        h1 i {
-            margin-right: 10px;
+
+        .logo-icon {
+            font-size: 2.5rem;
+            animation: pulse 2s infinite;
         }
-        
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .logo-text h1 {
+            font-weight: 500;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .logo-text p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .telegram-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--secondary);
+            color: var(--on-secondary);
+            padding: 10px 20px;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .telegram-btn:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Dashboard Grid */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
+            margin-top: 30px;
         }
-        
+
+        /* Cards */
         .card {
-            background: white;
-            border-radius: 12px;
+            background: var(--surface);
+            border-radius: 16px;
             padding: 25px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transition: transform 0.3s, box-shadow 0.3s;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        
+
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
-        
+
         .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 1.2rem;
             font-weight: 500;
             color: var(--primary);
             margin: 0;
         }
-        
+
+        .card-title .material-icons-round {
+            font-size: 1.4rem;
+        }
+
         .status-badge {
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
+
         .status-ok {
             background-color: #E8F5E9;
             color: var(--primary);
         }
-        
+
         .status-warning {
             background-color: #FFF8E1;
-            color: var(--warning);
+            color: #F57C00;
         }
-        
+
         .status-danger {
             background-color: #FFEBEE;
-            color: var(--danger);
+            color: var(--error);
         }
-        
+
+        /* Sensor Grid */
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .sensor-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        .sensor-item:hover {
+            background: rgba(46, 125, 50, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .sensor-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
         .sensor-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 300;
-            margin: 10px 0;
+            margin: 5px 0;
         }
-        
+
         .sensor-unit {
-            font-size: 1rem;
-            color: #78909C;
+            font-size: 0.9rem;
+            color: #757575;
         }
-        
+
+        .sensor-label {
+            font-size: 0.9rem;
+            color: #616161;
+        }
+
+        /* Charts */
         .chart-container {
             position: relative;
             height: 250px;
             width: 100%;
             margin-top: 20px;
         }
-        
+
+        /* Weather Card */
         .weather-card {
             display: flex;
             align-items: center;
-            padding: 15px;
+            padding: 20px;
             background: linear-gradient(135deg, #64B5F6 0%, #42A5F5 100%);
             color: white;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        
+
         .weather-icon {
-            font-size: 3rem;
-            margin-right: 20px;
+            font-size: 3.5rem;
+            margin-right: 25px;
+            animation: wobble 5s ease-in-out infinite;
         }
-        
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(3deg); }
+            75% { transform: rotate(-3deg); }
+        }
+
         .weather-details {
             flex-grow: 1;
         }
-        
+
         .weather-temp {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 300;
             margin: 0;
+            line-height: 1;
         }
-        
+
         .weather-desc {
             margin: 5px 0;
             font-weight: 500;
+            font-size: 1.1rem;
         }
-        
+
+        .weather-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .weather-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* Forecast */
         .hourly-forecast {
             display: flex;
             overflow-x: auto;
             gap: 15px;
-            padding: 10px 0;
+            padding: 15px 0;
             scrollbar-width: thin;
         }
-        
+
         .hourly-item {
-            min-width: 80px;
+            min-width: 90px;
             text-align: center;
             background: rgba(255,255,255,0.2);
-            border-radius: 8px;
-            padding: 10px;
             backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 15px 10px;
+            transition: all 0.3s ease;
         }
-        
+
+        .hourly-item:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
         .daily-forecast {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
-        
+
         .daily-item {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
         }
-        
+
+        .daily-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Plant Status */
+        .plant-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .plant-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        .plant-name {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .plant-variety {
+            color: #757575;
+            margin-bottom: 15px;
+        }
+
+        .plant-health {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .health-icon {
+            font-size: 1.5rem;
+        }
+
+        .health-ok {
+            color: var(--primary);
+        }
+
+        .health-warning {
+            color: #FFA000;
+        }
+
+        .health-danger {
+            color: var(--error);
+        }
+
+        /* Issues List */
+        .issues-list {
+            margin-top: 20px;
+        }
+
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 15px;
+            background: #FFF3E0;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .issue-icon {
+            color: #FFA000;
+            font-size: 1.2rem;
+        }
+
+        /* Controls */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .control-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface);
+            border: none;
+            padding: 20px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .control-btn:hover {
+            background: rgba(46, 125, 50, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .control-btn.active {
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+
+        .control-btn.active .control-icon {
+            color: var(--on-primary);
+        }
+
+        .control-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Action Log */
         .action-log {
             max-height: 300px;
             overflow-y: auto;
             padding-right: 10px;
         }
-        
+
         .log-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
-        
+
         .log-time {
+            min-width: 70px;
             font-size: 0.8rem;
-            color: #78909C;
-            min-width: 80px;
+            color: #757575;
         }
-        
-        .log-message {
-            flex-grow: 1;
-            padding-left: 10px;
-        }
-        
-        .material-icons.log-icon {
+
+        .log-icon {
             font-size: 1.2rem;
-            margin-right: 10px;
+            margin-right: 15px;
+            color: var(--primary);
         }
-        
-        .water-icon {
+
+        .log-water {
             color: #2196F3;
         }
-        
-        .fan-icon {
+
+        .log-fan {
             color: #4CAF50;
         }
-        
-        .temp-icon {
-            color: #F44336;
+
+        .log-light {
+            color: #FFC107;
         }
-        
+
+        .log-message {
+            flex-grow: 1;
+        }
+
+        /* Chatbot */
+        .chatbot-container {
+            grid-column: 1 / -1;
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .chatbot-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+
+        .chatbot-icon {
+            font-size: 1.8rem;
+            margin-right: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        .chatbot-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .chatbot-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #FAFAFA;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: #E8F5E9;
+            border-radius: 18px 18px 18px 4px;
+            padding: 12px 16px;
+            margin-right: auto;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--primary);
+            color: var(--on-primary);
+            border-radius: 18px 18px 4px 18px;
+            padding: 12px 16px;
+            margin-left: auto;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 15px;
+            background: var(--surface);
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .chatbot-input input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 24px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-input input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+        }
+
+        .chatbot-input button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-input button:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
             }
-        }
-        
-        /* Animazioni */
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-        
-        .floating {
-            animation: floating 3s ease-in-out infinite;
-        }
-        
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .logo {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="container">
-            <div class="header-content">
-                <h1><i class="material-icons">spa</i> Serra Intelligente - Belpasso</h1>
-                <div id="current-time" style="color: white;"></div>
+        <div class="header-content">
+            <div class="logo">
+                <span class="material-icons-round logo-icon">spa</span>
+                <div class="logo-text">
+                    <h1>Serra Intelligente</h1>
+                    <p>Belpasso, CT | Monitoraggio in tempo reale</p>
+                </div>
             </div>
+            <a href="https://t.me/serrautobot" class="telegram-btn" target="_blank">
+                <span class="material-icons-round">send</span>
+                Collegati al Bot
+            </a>
         </div>
     </header>
-    
+
     <div class="container">
         <div class="dashboard">
-            <!-- Sezione Ambiente Interno -->
+            <!-- Ambiente Interno -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><i class="material-icons">home</i> Ambiente Interno</h2>
-                    <span id="internal-status" class="status-badge status-ok">OK</span>
+                    <h2 class="card-title">
+                        <span class="material-icons-round">home</span>
+                        Ambiente Interno
+                    </h2>
+                    <span id="internal-status" class="status-badge status-ok">Ottimale</span>
                 </div>
                 
-                <div class="sensor-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <div style="display: flex; align-items: center;">
-                            <i class="material-icons temp-icon">thermostat</i>
-                            <span>Temperatura</span>
-                        </div>
-                        <div class="sensor-value" id="internal-temp">--<span class="sensor-unit">°C</span></div>
+                <div class="sensor-grid">
+                    <div class="sensor-item">
+                        <span class="material-icons-round sensor-icon">thermostat</span>
+                        <div class="sensor-value" id="internal-temp">24.5</div>
+                        <div class="sensor-unit">°C</div>
+                        <div class="sensor-label">Temperatura</div>
                     </div>
                     
-                    <div>
-                        <div style="display: flex; align-items: center;">
-                            <i class="material-icons">water_drop</i>
-                            <span>Umidità</span>
-                        </div>
-                        <div class="sensor-value" id="internal-humidity">--<span class="sensor-unit">%</span></div>
+                    <div class="sensor-item">
+                        <span class="material-icons-round sensor-icon">water_drop</span>
+                        <div class="sensor-value" id="internal-humidity">65</div>
+                        <div class="sensor-unit">%</div>
+                        <div class="sensor-label">Umidità</div>
                     </div>
                     
-                    <div>
-                        <div style="display: flex; align-items: center;">
-                            <i class="material-icons">grass</i>
-                            <span>Terreno</span>
-                        </div>
-                        <div class="sensor-value" id="internal-soil">--<span class="sensor-unit">%</span></div>
+                    <div class="sensor-item">
+                        <span class="material-icons-round sensor-icon">grass</span>
+                        <div class="sensor-value" id="internal-soil">72</div>
+                        <div class="sensor-unit">%</div>
+                        <div class="sensor-label">Terreno</div>
                     </div>
                     
-                    <div>
-                        <div style="display: flex; align-items: center;">
-                            <i class="material-icons">light_mode</i>
-                            <span>Luminosità</span>
-                        </div>
-                        <div class="sensor-value" id="internal-light">--<span class="sensor-unit">lux</span></div>
+                    <div class="sensor-item">
+                        <span class="material-icons-round sensor-icon">light_mode</span>
+                        <div class="sensor-value" id="internal-light">8500</div>
+                        <div class="sensor-unit">lux</div>
+                        <div class="sensor-label">Luminosità</div>
                     </div>
                 </div>
                 
@@ -323,83 +683,155 @@
                 </div>
             </div>
             
-            <!-- Sezione Meteo Esterno -->
+            <!-- Meteo Esterno -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><i class="material-icons">wb_sunny</i> Meteo Esterno</h2>
-                    <span id="external-status" class="status-badge status-ok">SERENO</span>
+                    <h2 class="card-title">
+                        <span class="material-icons-round">wb_sunny</span>
+                        Meteo Esterno
+                    </h2>
+                    <span id="external-status" class="status-badge status-ok">Sereno</span>
                 </div>
                 
-                <div id="current-weather" class="weather-card animate__animated animate__fadeIn">
-                    <i class="material-icons weather-icon floating">wb_sunny</i>
+                <div class="weather-card">
+                    <span class="material-icons-round weather-icon">wb_sunny</span>
                     <div class="weather-details">
-                        <h3 class="weather-temp">--°C</h3>
-                        <p class="weather-desc">Caricamento...</p>
-                        <div style="display: flex; justify-content: space-between;">
-                            <div><i class="material-icons">water_drop</i> <span id="weather-humidity">--%</span></div>
-                            <div><i class="material-icons">air</i> <span id="weather-wind">-- km/h</span></div>
-                            <div><i class="material-icons">umbrella</i> <span id="weather-rain">-- mm</span></div>
+                        <h3 class="weather-temp">28°C</h3>
+                        <p class="weather-desc">Sereno</p>
+                        <div class="weather-meta">
+                            <span class="weather-meta-item">
+                                <span class="material-icons-round">water_drop</span>
+                                <span id="weather-humidity">42%</span>
+                            </span>
+                            <span class="weather-meta-item">
+                                <span class="material-icons-round">air</span>
+                                <span id="weather-wind">12 km/h</span>
+                            </span>
+                            <span class="weather-meta-item">
+                                <span class="material-icons-round">umbrella</span>
+                                <span id="weather-rain">0 mm</span>
+                            </span>
                         </div>
                     </div>
                 </div>
                 
-                <h3 style="margin-top: 20px;"><i class="material-icons">schedule</i> Prossime ore</h3>
-                <div id="hourly-forecast" class="hourly-forecast"></div>
+                <h4>Prossime ore</h4>
+                <div class="hourly-forecast" id="hourly-forecast">
+                    <!-- Popolato via JavaScript -->
+                </div>
                 
-                <h3 style="margin-top: 20px;"><i class="material-icons">calendar_today</i> Prossimi giorni</h3>
-                <div id="daily-forecast" class="daily-forecast"></div>
+                <h4>Prossimi giorni</h4>
+                <div class="daily-forecast" id="daily-forecast">
+                    <!-- Popolato via JavaScript -->
+                </div>
             </div>
             
-            <!-- Sezione Stato Pianta -->
+            <!-- Stato Pianta -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><i class="material-icons">local_florist</i> Stato Pianta</h2>
-                    <span id="plant-status-badge" class="status-badge status-ok">OK</span>
+                    <h2 class="card-title">
+                        <span class="material-icons-round">local_florist</span>
+                        Stato Pianta
+                    </h2>
+                    <span id="plant-status-badge" class="status-badge status-ok">Sana</span>
                 </div>
                 
-                <div id="plant-info" style="margin-top: 15px;">
-                    <div style="text-align: center; padding: 20px;">
-                        <i class="material-icons" style="font-size: 3rem; color: #4CAF50;">help_outline</i>
-                        <p>Nessuna pianta selezionata</p>
+                <div class="plant-status">
+                    <span class="material-icons-round plant-icon">spa</span>
+                    <h3 class="plant-name">Basilico Genovese</h3>
+                    <p class="plant-variety">Ocimum basilicum</p>
+                    
+                    <div class="plant-health">
+                        <span class="material-icons-round health-icon health-ok">mood</span>
+                        <span>Stato di salute: Eccellente</span>
                     </div>
-                </div>
-                
-                <div id="plant-issues" style="margin-top: 20px; display: none;">
-                    <h3><i class="material-icons">warning</i> Avvisi</h3>
-                    <div id="issues-list" style="background: #FFF3E0; padding: 15px; border-radius: 8px;"></div>
-                </div>
-                
-                <div style="margin-top: 20px;">
-                    <h3><i class="material-icons">show_chart</i> Andamento</h3>
+                    
                     <div class="chart-container">
                         <canvas id="plant-chart"></canvas>
                     </div>
                 </div>
+                
+                <div class="issues-list" id="issues-list" style="display: none;">
+                    <div class="issue-item">
+                        <span class="material-icons-round issue-icon">warning</span>
+                        <div>
+                            <strong>Temperatura elevata</strong>
+                            <p>La temperatura ha superato i 30°C, attivare la ventilazione</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Sezione Controlli e Log -->
+            <!-- Controlli -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><i class="material-icons">settings</i> Controlli</h2>
+                    <h2 class="card-title">
+                        <span class="material-icons-round">settings</span>
+                        Controlli Automazione
+                    </h2>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                    <button id="water-btn" class="btn" style="background: #E3F2FD; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
-                        <i class="material-icons water-icon">water_drop</i> Irrigazione
+                <div class="controls-grid">
+                    <button class="control-btn" id="water-btn">
+                        <span class="material-icons-round control-icon">water_drop</span>
+                        <span class="control-label">Irrigazione</span>
                     </button>
-                    <button id="fan-btn" class="btn" style="background: #E8F5E9; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
-                        <i class="material-icons fan-icon">air</i> Ventilazione
+                    
+                    <button class="control-btn" id="fan-btn">
+                        <span class="material-icons-round control-icon">air</span>
+                        <span class="control-label">Ventilazione</span>
                     </button>
-                    <button id="lights-btn" class="btn" style="background: #FFF8E1; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
-                        <i class="material-icons">light_mode</i> Luci LED
+                    
+                    <button class="control-btn" id="lights-btn">
+                        <span class="material-icons-round control-icon">light_mode</span>
+                        <span class="control-label">Luci LED</span>
                     </button>
-                    <button id="refresh-btn" class="btn" style="background: #F3E5F5; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
-                        <i class="material-icons">refresh</i> Aggiorna
+                    
+                    <button class="control-btn" id="shade-btn">
+                        <span class="material-icons-round control-icon">filter_vintage</span>
+                        <span class="control-label">Ombreggiatura</span>
                     </button>
                 </div>
                 
-                <h3><i class="material-icons">list_alt</i> Log Azioni</h3>
-                <div id="action-log" class="action-log"></div>
+                <h4>Log Azioni Recenti</h4>
+                <div class="action-log" id="action-log">
+                    <div class="log-item">
+                        <span class="log-time">10:45</span>
+                        <span class="material-icons-round log-icon log-water">water_drop</span>
+                        <span class="log-message">Irrigazione attivata per 5 minuti</span>
+                    </div>
+                    <div class="log-item">
+                        <span class="log-time">09:30</span>
+                        <span class="material-icons-round log-icon log-fan">air</span>
+                        <span class="log-message">Ventilazione aumentata al 70%</span>
+                    </div>
+                    <div class="log-item">
+                        <span class="log-time">07:00</span>
+                        <span class="material-icons-round log-icon log-light">light_mode</span>
+                        <span class="log-message">Luci LED accese</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chatbot Serra -->
+            <div class="chatbot-container">
+                <div class="chatbot-header">
+                    <span class="material-icons-round chatbot-icon">psychology</span>
+                    <h3 class="chatbot-title">Assistente Serra Intelligente</h3>
+                </div>
+                
+                <div class="chatbot-messages" id="chatbot-messages">
+                    <div class="message bot-message">
+                        🌿 Ciao! Sono la tua Serra Intelligente. Come posso aiutarti oggi? Posso darti consigli sulle tue piante, sull'ambiente della serra o sull'automazione dei sistemi!
+                    </div>
+                </div>
+                
+                <div class="chatbot-input">
+                    <input type="text" id="chatbot-input" placeholder="Scrivi il tuo messaggio..." autocomplete="off">
+                    <button id="chatbot-send">
+                        <span class="material-icons-round">send</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -408,10 +840,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Configurazione Supabase
-        const supabaseUrl = 'https://dahrfnesfyxhtvyhzocn.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        // Configurazione
+        const GROQ_API_KEY = "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";
+        const GROQ_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
         
         // Inizializzazione grafici
         const internalCtx = document.getElementById('internal-chart').getContext('2d');
@@ -420,11 +851,11 @@
         const internalChart = new Chart(internalCtx, {
             type: 'line',
             data: {
-                labels: [],
+                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
                 datasets: [
                     {
                         label: 'Temperatura (°C)',
-                        data: [],
+                        data: Array.from({length: 24}, () => Math.floor(Math.random() * 5) + 22),
                         borderColor: '#F44336',
                         backgroundColor: 'rgba(244, 67, 54, 0.1)',
                         tension: 0.3,
@@ -432,7 +863,7 @@
                     },
                     {
                         label: 'Umidità (%)',
-                        data: [],
+                        data: Array.from({length: 24}, () => Math.floor(Math.random() * 20) + 50),
                         borderColor: '#2196F3',
                         backgroundColor: 'rgba(33, 150, 243, 0.1)',
                         tension: 0.3,
@@ -476,11 +907,11 @@
         const plantChart = new Chart(plantCtx, {
             type: 'line',
             data: {
-                labels: [],
+                labels: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
                 datasets: [
                     {
                         label: 'Condizioni Ideali',
-                        data: [],
+                        data: [85, 85, 85, 85, 85, 85, 85],
                         borderColor: '#4CAF50',
                         backgroundColor: 'rgba(76, 175, 80, 0.1)',
                         borderDash: [5, 5],
@@ -488,7 +919,7 @@
                     },
                     {
                         label: 'Condizioni Attuali',
-                        data: [],
+                        data: [70, 72, 75, 78, 80, 82, 84],
                         borderColor: '#FF9800',
                         backgroundColor: 'rgba(255, 152, 0, 0.1)',
                         tension: 0.3
@@ -500,7 +931,9 @@
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        beginAtZero: true,
+                        beginAtZero: false,
+                        min: 50,
+                        max: 100,
                         title: {
                             display: true,
                             text: 'Indice Benessere'
@@ -510,293 +943,134 @@
             }
         });
         
-        // Funzioni per aggiornare i dati
-        async function fetchAllData() {
-            await fetchSensorData();
-            await fetchWeatherData();
-            await fetchPlantData();
-            await fetchActionLog();
-            updateCurrentTime();
-        }
-        
-        async function fetchSensorData() {
-            try {
-                // Recupera ultimi 50 dati sensori
-                const { data: sensors, error } = await supabase
-                    .from('SENSORS')
-                    .select('*')
-                    .order('timestamp', { ascending: false })
-                    .limit(50);
-                
-                if (sensors && sensors.length > 0) {
-                    sensors.reverse(); // Ordine cronologico
-                    
-                    // Aggiorna valori correnti
-                    const last = sensors[sensors.length - 1];
-                    document.getElementById('internal-temp').innerHTML = `${last.temperature.toFixed(1)}<span class="sensor-unit">°C</span>`;
-                    document.getElementById('internal-humidity').innerHTML = `${last.humidity.toFixed(1)}<span class="sensor-unit">%</span>`;
-                    document.getElementById('internal-soil').innerHTML = `${last.soil_moisture}<span class="sensor-unit">%</span>`;
-                    document.getElementById('internal-light').innerHTML = `${last.light_level}<span class="sensor-unit">lux</span>`;
-                    
-                    // Aggiorna grafico
-                    internalChart.data.labels = sensors.map(item => new Date(item.timestamp).toLocaleTimeString());
-                    internalChart.data.datasets[0].data = sensors.map(item => item.temperature);
-                    internalChart.data.datasets[1].data = sensors.map(item => item.humidity);
-                    internalChart.update();
-                    
-                    // Aggiorna stato
-                    updateInternalStatus(last);
-                }
-            } catch (error) {
-                console.error('Error fetching sensor data:', error);
-            }
-        }
-        
-        function updateInternalStatus(sensorData) {
-            const statusElement = document.getElementById('internal-status');
+        // Popola previsioni meteo (dati simulati)
+        function populateWeatherForecast() {
+            const hourlyContainer = document.getElementById('hourly-forecast');
+            const dailyContainer = document.getElementById('daily-forecast');
             
-            // Logica semplificata per lo stato
-            if (sensorData.temperature > 30 || sensorData.humidity > 80) {
-                statusElement.textContent = 'ATTENZIONE';
-                statusElement.className = 'status-badge status-warning';
-            } else if (sensorData.temperature < 10 || sensorData.humidity < 30) {
-                statusElement.textContent = 'CRITICO';
-                statusElement.className = 'status-badge status-danger';
-            } else {
-                statusElement.textContent = 'OK';
-                statusElement.className = 'status-badge status-ok';
-            }
-        }
-        
-        async function fetchWeatherData() {
-            try {
-                const { data: weather, error } = await supabase
-                    .from('WEATHER_DATA')
-                    .select('*')
-                    .eq('location', 'Belpasso')
-                    .order('last_update', { ascending: false })
-                    .limit(1);
+            // Previsioni orarie
+            hourlyContainer.innerHTML = Array.from({length: 12}, (_, i) => {
+                const hour = new Date();
+                hour.setHours(hour.getHours() + i);
+                const temp = Math.floor(Math.random() * 5) + 25;
+                const rain = Math.random() > 0.7 ? Math.floor(Math.random() * 30) : 0;
                 
-                if (weather && weather[0]) {
-                    const w = weather[0].data;
-                    
-                    // Meteo corrente
-                    const current = w.current;
-                    const weatherIcon = document.querySelector('#current-weather .weather-icon');
-                    const weatherDesc = current.weather.toLowerCase();
-                    
-                    // Mappa icone meteo
-                    const iconMap = {
-                        'clear': 'wb_sunny',
-                        'clouds': 'cloud',
-                        'rain': 'umbrella',
-                        'thunderstorm': 'flash_on',
-                        'snow': 'ac_unit',
-                        'mist': 'cloud',
-                        'fog': 'cloud',
-                        'drizzle': 'grain'
-                    };
-                    
-                    weatherIcon.textContent = iconMap[weatherDesc.split(' ')[0]] || 'wb_sunny';
-                    document.querySelector('.weather-temp').textContent = `${current.temp.toFixed(1)}°C`;
-                    document.querySelector('.weather-desc').textContent = current.weather;
-                    document.getElementById('weather-humidity').textContent = `${current.humidity}%`;
-                    document.getElementById('weather-wind').textContent = `${(current.wind_speed * 3.6).toFixed(1)} km/h`;
-                    document.getElementById('weather-rain').textContent = current.rain > 0 ? current.rain.toFixed(1) : '0';
-                    
-                    // Aggiorna stato esterno
-                    const externalStatus = document.getElementById('external-status');
-                    if (current.rain > 5) {
-                        externalStatus.textContent = 'PIOGGIA';
-                        externalStatus.className = 'status-badge status-danger';
-                    } else if (current.rain > 0) {
-                        externalStatus.textContent = 'PIOGGIA LEGGERA';
-                        externalStatus.className = 'status-badge status-warning';
-                    } else {
-                        externalStatus.textContent = weatherDesc.toUpperCase();
-                        externalStatus.className = 'status-badge status-ok';
-                    }
-                    
-                    // Previsioni orarie
-                    const hourlyContainer = document.getElementById('hourly-forecast');
-                    hourlyContainer.innerHTML = w.hourly.slice(0, 12).map(h => {
-                        const time = new Date(h.time).toLocaleTimeString([], {hour: '2-digit'});
-                        return `
-                            <div class="hourly-item animate__animated animate__fadeIn">
-                                <p><strong>${time}</strong></p>
-                                <i class="material-icons">${iconMap[h.icon.split(' ')[0]] || 'wb_sunny'}</i>
-                                <p>${h.temp.toFixed(0)}°C</p>
-                                ${h.pop > 30 ? `<p><i class="material-icons" style="font-size: 1rem;">umbrella</i> ${h.pop.toFixed(0)}%</p>` : ''}
-                            </div>
-                        `;
-                    }).join('');
-                    
-                    // Previsioni giornaliere
-                    const dailyContainer = document.getElementById('daily-forecast');
-                    dailyContainer.innerHTML = w.daily.map(d => {
-                        const date = new Date(d.date);
-                        return `
-                            <div class="daily-item animate__animated animate__fadeIn">
-                                <p><strong>${date.toLocaleDateString([], {weekday: 'short'})}</strong></p>
-                                <i class="material-icons">${iconMap[d.icon.split(' ')[0]] || 'wb_sunny'}</i>
-                                <p>${d.temp_day.toFixed(0)}°C</p>
-                                <p>${d.temp_night.toFixed(0)}°C <i class="material-icons" style="font-size: 1rem;">dark_mode</i></p>
-                                ${d.pop > 30 ? `<p><i class="material-icons" style="font-size: 1rem;">umbrella</i> ${d.pop.toFixed(0)}%</p>` : ''}
-                            </div>
-                        `;
-                    }).join('');
-                }
-            } catch (error) {
-                console.error('Error fetching weather data:', error);
-            }
-        }
-        
-        async function fetchPlantData() {
-            try {
-                // Recupera stato pianta
-                const { data: plantStatus, error } = await supabase
-                    .from('PLANT_STATUS')
-                    .select('*')
-                    .order('last_update', { ascending: false })
-                    .limit(1);
+                return `
+                    <div class="hourly-item">
+                        <p><strong>${hour.getHours()}:00</strong></p>
+                        <p>${temp}°C</p>
+                        <p>💧 ${Math.floor(Math.random() * 20) + 50}%</p>
+                        ${rain > 0 ? `<p>☔ ${rain}%</p>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            // Previsioni giornaliere
+            dailyContainer.innerHTML = Array.from({length: 5}, (_, i) => {
+                const day = new Date();
+                day.setDate(day.getDate() + i);
+                const dayNames = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
                 
-                if (plantStatus && plantStatus[0]) {
-                    const status = plantStatus[0];
-                    const badge = document.getElementById('plant-status-badge');
-                    
-                    // Aggiorna badge stato
-                    if (status.status === 'OK') {
-                        badge.textContent = 'SANO';
-                        badge.className = 'status-badge status-ok';
-                    } else if (status.status === 'ATTENZIONE') {
-                        badge.textContent = 'ATTENZIONE';
-                        badge.className = 'status-badge status-warning';
-                    } else {
-                        badge.textContent = 'CRITICO';
-                        badge.className = 'status-badge status-danger';
-                    }
-                    
-                    // Aggiorna informazioni pianta
-                    document.getElementById('plant-info').innerHTML = `
-                        <div style="text-align: center; padding: 10px;">
-                            <i class="material-icons floating" style="font-size: 3rem; color: #4CAF50;">local_florist</i>
-                            <h3>${status.plant_name}</h3>
-                            <p>Ultimo aggiornamento: ${new Date(status.last_update).toLocaleString()}</p>
-                        </div>
-                    `;
-                    
-                    // Mostra avvisi se presenti
-                    if (status.issues) {
-                        document.getElementById('plant-issues').style.display = 'block';
-                        document.getElementById('issues-list').innerHTML = `
-                            <p><i class="material-icons">warning</i> ${status.issues}</p>
-                        `;
-                    } else {
-                        document.getElementById('plant-issues').style.display = 'none';
-                    }
-                    
-                    // Aggiorna grafico pianta (dati simulati)
-                    updatePlantChart(status.plant_name);
-                }
-            } catch (error) {
-                console.error('Error fetching plant data:', error);
-            }
+                return `
+                    <div class="daily-item">
+                        <p><strong>${dayNames[day.getDay()]}</strong></p>
+                        <p>${Math.floor(Math.random() * 5) + 24}°C</p>
+                        <p>${Math.floor(Math.random() * 5) + 18}°C 🌙</p>
+                        <p>💧 ${Math.floor(Math.random() * 20) + 50}%</p>
+                    </div>
+                `;
+            }).join('');
         }
         
-        function updatePlantChart(plantName) {
-            // Simula dati per il grafico
-            const labels = [];
-            const idealData = [];
-            const actualData = [];
-            
-            for (let i = 0; i < 7; i++) {
-                labels.push(`Giorno ${i + 1}`);
-                idealData.push(80 + Math.random() * 10);
-                actualData.push(60 + Math.random() * 40);
-            }
-            
-            plantChart.data.labels = labels;
-            plantChart.data.datasets[0].data = idealData;
-            plantChart.data.datasets[1].data = actualData;
-            plantChart.update();
-        }
-        
-        async function fetchActionLog() {
-            try {
-                const { data: actions, error } = await supabase
-                    .from('LOG')
-                    .select('*')
-                    .order('timestamp', { ascending: false })
-                    .limit(10);
-                
-                if (actions) {
-                    const logContainer = document.getElementById('action-log');
-                    logContainer.innerHTML = actions.map(action => {
-                        const date = new Date(action.timestamp);
-                        let icon = 'info';
-                        let iconColor = '';
-                        
-                        if (action.action.includes('WATER')) {
-                            icon = 'water_drop';
-                            iconColor = 'water-icon';
-                        } else if (action.action.includes('FAN')) {
-                            icon = 'air';
-                            iconColor = 'fan-icon';
-                        } else if (action.action.includes('TEMP')) {
-                            icon = 'thermostat';
-                            iconColor = 'temp-icon';
-                        }
-                        
-                        return `
-                            <div class="log-item animate__animated animate__fadeIn">
-                                <span class="log-time">${date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</span>
-                                <i class="material-icons log-icon ${iconColor}">${icon}</i>
-                                <span class="log-message">${action.action.replace(/_/g, ' ')}</span>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            } catch (error) {
-                console.error('Error fetching action log:', error);
-            }
-        }
-        
-        function updateCurrentTime() {
-            const now = new Date();
-            document.getElementById('current-time').textContent = now.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
-        
-        // Gestione pulsanti
-        document.getElementById('refresh-btn').addEventListener('click', fetchAllData);
-        
-        document.getElementById('water-btn').addEventListener('click', async () => {
-            // Simula invio comando irrigazione
-            const { error } = await supabase
-                .from('LOG')
-                .insert([{ action: 'MANUAL_WATER_ON', timestamp: new Date().toISOString() }]);
-            
-            if (!error) {
-                fetchActionLog();
-                // Aggiungi animazione
-                const btn = document.getElementById('water-btn');
-                btn.classList.add('animate__animated', 'animate__pulse');
-                setTimeout(() => {
-                    btn.classList.remove('animate__animated', 'animate__pulse');
-                }, 1000);
-            }
+        // Gestione chatbot
+        document.getElementById('chatbot-send').addEventListener('click', sendMessage);
+        document.getElementById('chatbot-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
         
-        // Carica i dati iniziali
-        fetchAllData();
+        async function sendMessage() {
+            const input = document.getElementById('chatbot-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('chatbot-messages');
+            
+            // Aggiungi messaggio utente
+            messagesContainer.innerHTML += `
+                <div class="message user-message">
+                    ${message}
+                </div>
+            `;
+            
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Mostra indicatori di caricamento
+            const loadingId = 'loading-' + Date.now();
+            messagesContainer.innerHTML += `
+                <div id="${loadingId}" class="message bot-message">
+                    <span class="loading" style="display: inline-block;"></span> Sto pensando...
+                </div>
+            `;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            try {
+                // Chiamata API Groq
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: GROQ_MODEL,
+                        messages: [
+                            {
+                                role: "system",
+                                content: "Tu sei una Serra Intelligente, parli solo italiano, sei gentile e dolce, aggiungi degli emoticon verdi, sei concisa e decisa. conosci ogni tipo di pianta e frutta in natura. Non puoi parlare di argomenti che escono troppo fuori dalla natura. Devi saperne di ventilazione per serre, temperatura, umidità, irrigazione, luci led eccetera eccetera, per non far seccare o ammalare il raccolto, è importantissimo che tu faccia attenzione. Devi saperne anche di energia autogestita, di pannelli solari, inverter, batterie. Devi conoscere ogni caratteristica di frutta e verdura. Devi conoscere rarità e prezzi. E ricorda che sei la serra del tuo utente, ti devi occupare di tenere tutto pulito ed in funzione."
+                            },
+                            {
+                                role: "user",
+                                content: message
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 500
+                    })
+                });
+                
+                const data = await response.json();
+                const botResponse = data.choices[0].message.content;
+                
+                // Sostituisci il messaggio di caricamento con la risposta
+                document.getElementById(loadingId).outerHTML = `
+                    <div class="message bot-message">
+                        ${botResponse}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error("Errore chatbot:", error);
+                document.getElementById(loadingId).outerHTML = `
+                    <div class="message bot-message">
+                        ⚠️ Si è verificato un errore. Riprova più tardi.
+                    </div>
+                `;
+            }
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
         
-        // Aggiorna i dati ogni 30 secondi
-        setInterval(fetchAllData, 30000);
-        // Aggiorna l'orario ogni secondo
-        setInterval(updateCurrentTime, 1000);
-    </script>
-</body>
-</html>
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', () => {
+            populateWeatherForecast();
+            
+            // Simula dati sensori in tempo reale
+            setInterval(() => {
+                document.getElementById('internal-temp').textContent = (Math.random() * 2 + 23.5).toFixed(1);
+                document.getElementById('internal-humidity').textContent = Math.floor(Math.random() * 10 + 60);
+                document.getElementById('internal-soil').textContent = Math.floor(Math.random() * 10 + 65);
+                document.getElementById('internal-light').textContent = Math.floor(Math.random() * 2000 + 7000);
+            }, 5000);
+            
+            // Gestione pulsanti
