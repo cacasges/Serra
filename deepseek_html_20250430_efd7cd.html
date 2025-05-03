@@ -3,564 +3,800 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serra Intelligente | Controllo Automatizzato</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>🌿 Serra Intelligente | Belpasso</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary: #2E8B57;
-            --primary-light: #5DBE7E;
-            --secondary: #1E4D40;
-            --accent: #FFA630;
-            --danger: #FF5A5F;
-            --light: #F5FDF9;
-            --dark: #1A2E28;
-            --shadow: 0 10px 30px rgba(0,0,0,0.1);
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --primary: #2E7D32;
+            --primary-light: #60AD5E;
+            --secondary: #FFC107;
+            --dark: #263238;
+            --light: #ECEFF1;
+            --danger: #D32F2F;
+            --warning: #FFA000;
         }
-
-        * {
-            box-sizing: border-box;
+        
+        body {
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #F0FAF5 0%, #E0F5EC 100%);
+            background-color: #f5f7fa;
             color: var(--dark);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
         }
-
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
         header {
-            background: white;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
-            z-index: 10;
         }
-
-        .logo {
+        
+        h1 {
+            margin: 0;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            font-weight: 700;
-            font-size: 1.4rem;
-            color: var(--secondary);
         }
-
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: var(--primary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        
+        h1 i {
+            margin-right: 10px;
         }
-
-        .mode-switch {
-            display: flex;
-            background: var(--light);
-            border-radius: 50px;
-            padding: 0.3rem;
-            gap: 0.3rem;
-        }
-
-        .mode-btn {
-            padding: 0.6rem 1.2rem;
-            border-radius: 50px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            background: transparent;
-            transition: var(--transition);
-        }
-
-        .mode-btn.active {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            color: var(--primary);
-        }
-
-        main {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
+        
         .dashboard {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
         }
-
-        @media (min-width: 1024px) {
-            .dashboard {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
-
-        .greenhouse-section {
+        
+        .card {
             background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .section-title svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .environment-display {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .env-card {
-            background: var(--light);
-            border-radius: 16px;
-            padding: 1.5rem 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.8rem;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .env-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: var(--transition);
-        }
-
-        .env-card.warning::after {
-            background: var(--danger);
-            transform: scaleX(1);
-        }
-
-        .env-card.optimal::after {
-            transform: scaleX(1);
-        }
-
-        .env-icon {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .env-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--secondary);
-        }
-
-        .env-label {
-            font-size: 0.9rem;
-            color: var(--secondary);
-            opacity: 0.8;
-            text-align: center;
-        }
-
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .control-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-
-        .control-card:hover {
+        
+        .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-
-        .control-card.active {
-            border-color: var(--primary);
-            background: var(--light);
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
         }
-
-        .control-card.active .control-icon {
-            animation: pulse 1.5s infinite;
-        }
-
-        .control-icon {
-            width: 80px;
-            height: 80px;
-            position: relative;
-        }
-
-        .control-label {
-            font-weight: 600;
-            color: var(--secondary);
-            text-align: center;
-        }
-
-        .status {
-            font-size: 0.8rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 50px;
-            background: #E8F5EE;
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 500;
             color: var(--primary);
+            margin: 0;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 500;
         }
-
-        .status.off {
-            background: #F5F5F5;
-            color: #888;
+        
+        .status-ok {
+            background-color: #E8F5E9;
+            color: var(--primary);
         }
-
+        
+        .status-warning {
+            background-color: #FFF8E1;
+            color: var(--warning);
+        }
+        
+        .status-danger {
+            background-color: #FFEBEE;
+            color: var(--danger);
+        }
+        
+        .sensor-value {
+            font-size: 2rem;
+            font-weight: 300;
+            margin: 10px 0;
+        }
+        
+        .sensor-unit {
+            font-size: 1rem;
+            color: #78909C;
+        }
+        
         .chart-container {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            height: 100%;
-        }
-
-        .chart-placeholder {
+            position: relative;
+            height: 250px;
             width: 100%;
-            height: 300px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 300"><path d="M20,280 L50,220 L80,240 L110,180 L140,200 L170,150 L200,170 L230,120 L260,140 L290,90 L320,110 L350,60 L380,80" fill="none" stroke="%232E8B57" stroke-width="3" stroke-linecap="round"/><path d="M20,280 L50,220 L80,240 L110,180 L140,200 L170,150 L200,170 L230,120 L260,140 L290,90 L320,110 L350,60 L380,80" fill="url(%23gradient)" opacity="0.2"/><defs><linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="%232E8B57"/><stop offset="100%" stop-color="%23F5FDF9"/></linearGradient></defs></svg>') center no-repeat;
-            background-size: contain;
+            margin-top: 20px;
         }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        
+        .weather-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #64B5F6 0%, #42A5F5 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
         }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .weather-icon {
+            font-size: 3rem;
+            margin-right: 20px;
         }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        
+        .weather-details {
+            flex-grow: 1;
         }
-
-        @keyframes glow {
-            0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 10px rgba(255, 166, 48, 0.5)); }
-            50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(255, 166, 48, 0.8)); }
+        
+        .weather-temp {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin: 0;
         }
-
-        /* Icon animations */
-        .sun-icon {
-            animation: float 6s ease-in-out infinite;
+        
+        .weather-desc {
+            margin: 5px 0;
+            font-weight: 500;
         }
-
-        .sun-rays {
-            animation: rotate 20s linear infinite;
+        
+        .hourly-forecast {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 0;
+            scrollbar-width: thin;
         }
-
-        .water-drop {
-            animation: float 4s 0.5s ease-in-out infinite;
+        
+        .hourly-item {
+            min-width: 80px;
+            text-align: center;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 10px;
+            backdrop-filter: blur(5px);
         }
-
-        .plant-icon {
-            animation: float 5s 0.2s ease-in-out infinite;
+        
+        .daily-forecast {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
-
-        .fan-blades {
-            animation: rotate 1.5s linear infinite;
-            transform-origin: center;
+        
+        .daily-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-
-        .light-glow {
-            animation: glow 2s ease-in-out infinite;
+        
+        .action-log {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
-
-        .pump-waves {
-            animation: pulse 2s ease-in-out infinite;
+        
+        .log-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
         }
-
-        /* Responsive adjustments */
+        
+        .log-time {
+            font-size: 0.8rem;
+            color: #78909C;
+            min-width: 80px;
+        }
+        
+        .log-message {
+            flex-grow: 1;
+            padding-left: 10px;
+        }
+        
+        .material-icons.log-icon {
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        
+        .water-icon {
+            color: #2196F3;
+        }
+        
+        .fan-icon {
+            color: #4CAF50;
+        }
+        
+        .temp-icon {
+            color: #F44336;
+        }
+        
         @media (max-width: 768px) {
-            .environment-display, .controls-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .dashboard {
+                grid-template-columns: 1fr;
             }
-            
-            main {
-                padding: 1rem;
-            }
-            
-            .greenhouse-section, .chart-container {
-                padding: 1.5rem;
-            }
+        }
+        
+        /* Animazioni */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">
-            <div class="logo-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L3 10l3 3v7a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7l3-3-9-8z"></path>
-                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-                </svg>
+        <div class="container">
+            <div class="header-content">
+                <h1><i class="material-icons">spa</i> Serra Intelligente - Belpasso</h1>
+                <div id="current-time" style="color: white;"></div>
             </div>
-            <span>Serra Intelligente</span>
-        </div>
-        
-        <div class="mode-switch">
-            <button class="mode-btn active">Automatico</button>
-            <button class="mode-btn">Manuale</button>
         </div>
     </header>
     
-    <main>
+    <div class="container">
         <div class="dashboard">
-            <div class="greenhouse-section">
-                <h2 class="section-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L3 10l3 3v7a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-7l3-3-9-8z"></path>
-                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-                    </svg>
-                    Ambiente Serra
-                </h2>
+            <!-- Sezione Ambiente Interno -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="material-icons">home</i> Ambiente Interno</h2>
+                    <span id="internal-status" class="status-badge status-ok">OK</span>
+                </div>
                 
-                <div class="environment-display">
-                    <div class="env-card optimal">
-                        <div class="env-icon">
-                            <svg class="sun-icon" width="60" height="60" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="25" fill="var(--accent)"/>
-                                <g class="sun-rays" style="transform-origin: 50% 50%">
-                                    <circle cx="50" cy="15" r="5" fill="var(--accent)" opacity="0.8"/>
-                                    <circle cx="85" cy="50" r="5" fill="var(--accent)" opacity="0.8"/>
-                                    <circle cx="50" cy="85" r="5" fill="var(--accent)" opacity="0.8"/>
-                                    <circle cx="15" cy="50" r="5" fill="var(--accent)" opacity="0.8"/>
-                                    <circle cx="70" cy="30" r="4" fill="var(--accent)" opacity="0.7"/>
-                                    <circle cx="30" cy="70" r="4" fill="var(--accent)" opacity="0.7"/>
-                                    <circle cx="70" cy="70" r="4" fill="var(--accent)" opacity="0.7"/>
-                                    <circle cx="30" cy="30" r="4" fill="var(--accent)" opacity="0.7"/>
-                                </g>
-                            </svg>
+                <div class="sensor-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <div style="display: flex; align-items: center;">
+                            <i class="material-icons temp-icon">thermostat</i>
+                            <span>Temperatura</span>
                         </div>
-                        <div class="env-value">24°C</div>
-                        <div class="env-label">Temperatura</div>
+                        <div class="sensor-value" id="internal-temp">--<span class="sensor-unit">°C</span></div>
                     </div>
                     
-                    <div class="env-card optimal">
-                        <div class="env-icon">
-                            <svg class="water-drop" width="60" height="60" viewBox="0 0 100 100">
-                                <path d="M50 20Q55 30 50 40Q45 30 50 20" fill="#4CC9F0"/>
-                                <path d="M50 40Q55 50 50 60Q45 50 50 40" fill="#4CC9F0" opacity="0.8"/>
-                                <circle cx="50" cy="70" r="15" fill="#4CC9F0" opacity="0.2"/>
-                            </svg>
+                    <div>
+                        <div style="display: flex; align-items: center;">
+                            <i class="material-icons">water_drop</i>
+                            <span>Umidità</span>
                         </div>
-                        <div class="env-value">65%</div>
-                        <div class="env-label">Umidità</div>
+                        <div class="sensor-value" id="internal-humidity">--<span class="sensor-unit">%</span></div>
                     </div>
                     
-                    <div class="env-card">
-                        <div class="env-icon">
-                            <svg class="plant-icon" width="60" height="60" viewBox="0 0 100 100">
-                                <path d="M50 80L50 40" stroke="var(--primary)" stroke-width="4" stroke-linecap="round"/>
-                                <path d="M50 40Q40 30 35 35Q40 40 50 45Q60 40 65 35Q60 30 50 40" fill="var(--primary-light)"/>
-                                <path d="M50 45Q45 50 50 55Q55 50 50 45" fill="var(--accent)"/>
-                            </svg>
+                    <div>
+                        <div style="display: flex; align-items: center;">
+                            <i class="material-icons">grass</i>
+                            <span>Terreno</span>
                         </div>
-                        <div class="env-value">Buono</div>
-                        <div class="env-label">Stato Piante</div>
+                        <div class="sensor-value" id="internal-soil">--<span class="sensor-unit">%</span></div>
                     </div>
                     
-                    <div class="env-card warning">
-                        <div class="env-icon">
-                            <svg width="60" height="60" viewBox="0 0 100 100">
-                                <path d="M50 10L90 90H10L50 10Z" fill="var(--danger)" opacity="0.2" stroke="var(--danger)" stroke-width="2"/>
-                                <path d="M50 35V55M50 65V65" stroke="var(--danger)" stroke-width="3" stroke-linecap="round"/>
-                            </svg>
+                    <div>
+                        <div style="display: flex; align-items: center;">
+                            <i class="material-icons">light_mode</i>
+                            <span>Luminosità</span>
                         </div>
-                        <div class="env-value">3.2</div>
-                        <div class="env-label">pH Terreno</div>
+                        <div class="sensor-value" id="internal-light">--<span class="sensor-unit">lux</span></div>
                     </div>
                 </div>
                 
-                <h2 class="section-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    Controlli
-                </h2>
+                <div class="chart-container">
+                    <canvas id="internal-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Sezione Meteo Esterno -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="material-icons">wb_sunny</i> Meteo Esterno</h2>
+                    <span id="external-status" class="status-badge status-ok">SERENO</span>
+                </div>
                 
-                <div class="controls-grid">
-                    <div class="control-card">
-                        <div class="control-icon">
-                            <svg width="80" height="80" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="35" fill="var(--light)" stroke="var(--secondary)" stroke-width="2"/>
-                                <g class="fan-blades">
-                                    <path d="M50 15L55 20L50 25" fill="var(--secondary)"/>
-                                    <path d="M85 50L80 55L75 50" fill="var(--secondary)"/>
-                                    <path d="M50 85L55 80L50 75" fill="var(--secondary)"/>
-                                    <path d="M15 50L20 55L25 50" fill="var(--secondary)"/>
-                                </g>
-                                <circle cx="50" cy="50" r="10" fill="var(--accent)"/>
-                            </svg>
+                <div id="current-weather" class="weather-card animate__animated animate__fadeIn">
+                    <i class="material-icons weather-icon floating">wb_sunny</i>
+                    <div class="weather-details">
+                        <h3 class="weather-temp">--°C</h3>
+                        <p class="weather-desc">Caricamento...</p>
+                        <div style="display: flex; justify-content: space-between;">
+                            <div><i class="material-icons">water_drop</i> <span id="weather-humidity">--%</span></div>
+                            <div><i class="material-icons">air</i> <span id="weather-wind">-- km/h</span></div>
+                            <div><i class="material-icons">umbrella</i> <span id="weather-rain">-- mm</span></div>
                         </div>
-                        <div class="control-label">Ventilazione</div>
-                        <div class="status off">OFF</div>
                     </div>
-                    
-                    <div class="control-card active">
-                        <div class="control-icon">
-                            <svg width="80" height="80" viewBox="0 0 100 100">
-                                <path class="light-glow" d="M50 20Q60 15 70 25Q65 40 50 50Q35 40 30 25Q40 15 50 20" fill="var(--accent)"/>
-                                <rect x="45" y="50" width="10" height="15" rx="2" fill="var(--secondary)"/>
-                                <path d="M50 30Q55 35 50 40Q45 35 50 30" fill="white" opacity="0.9"/>
-                            </svg>
-                        </div>
-                        <div class="control-label">Illuminazione</div>
-                        <div class="status">ON</div>
+                </div>
+                
+                <h3 style="margin-top: 20px;"><i class="material-icons">schedule</i> Prossime ore</h3>
+                <div id="hourly-forecast" class="hourly-forecast"></div>
+                
+                <h3 style="margin-top: 20px;"><i class="material-icons">calendar_today</i> Prossimi giorni</h3>
+                <div id="daily-forecast" class="daily-forecast"></div>
+            </div>
+            
+            <!-- Sezione Stato Pianta -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="material-icons">local_florist</i> Stato Pianta</h2>
+                    <span id="plant-status-badge" class="status-badge status-ok">OK</span>
+                </div>
+                
+                <div id="plant-info" style="margin-top: 15px;">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="material-icons" style="font-size: 3rem; color: #4CAF50;">help_outline</i>
+                        <p>Nessuna pianta selezionata</p>
                     </div>
-                    
-                    <div class="control-card">
-                        <div class="control-icon">
-                            <svg width="80" height="80" viewBox="0 0 100 100">
-                                <rect x="30" y="40" width="40" height="30" rx="5" fill="var(--primary)"/>
-                                <circle cx="65" cy="55" r="10" fill="var(--secondary)"/>
-                                <rect x="65" y="50" width="15" height="10" fill="var(--secondary)"/>
-                                <path d="M30 55L20 55L15 50L15 60L20 55" fill="var(--secondary)"/>
-                                <circle cx="50" cy="55" r="5" fill="var(--light)"/>
-                                <path d="M50 50L50 60M45 55L55 55" stroke="var(--light)" stroke-width="2"/>
-                                <g class="pump-waves">
-                                    <circle cx="20" cy="55" r="3" fill="none" stroke="var(--primary-light)" stroke-width="2" opacity="0">
-                                        <animate attributeName="r" values="3;8" dur="1.5s" repeatCount="indefinite"/>
-                                        <animate attributeName="opacity" values="0.5;0" dur="1.5s" repeatCount="indefinite"/>
-                                    </circle>
-                                </g>
-                            </svg>
-                        </div>
-                        <div class="control-label">Irrigazione</div>
-                        <div class="status off">OFF</div>
+                </div>
+                
+                <div id="plant-issues" style="margin-top: 20px; display: none;">
+                    <h3><i class="material-icons">warning</i> Avvisi</h3>
+                    <div id="issues-list" style="background: #FFF3E0; padding: 15px; border-radius: 8px;"></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3><i class="material-icons">show_chart</i> Andamento</h3>
+                    <div class="chart-container">
+                        <canvas id="plant-chart"></canvas>
                     </div>
                 </div>
             </div>
             
-            <div class="chart-container">
-                <h2 class="section-title">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 21H3v-2h18v2zM8 13v5H4v-5h4zm6-4v9h-4V9h4zm6-3v12h-4V6h4z"></path>
-                    </svg>
-                    Andamento Ambientale
-                </h2>
-                <div class="chart-placeholder"></div>
-                <!-- Qui andrà il grafico reale con Chart.js o similari -->
+            <!-- Sezione Controlli e Log -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="material-icons">settings</i> Controlli</h2>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                    <button id="water-btn" class="btn" style="background: #E3F2FD; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
+                        <i class="material-icons water-icon">water_drop</i> Irrigazione
+                    </button>
+                    <button id="fan-btn" class="btn" style="background: #E8F5E9; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
+                        <i class="material-icons fan-icon">air</i> Ventilazione
+                    </button>
+                    <button id="lights-btn" class="btn" style="background: #FFF8E1; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
+                        <i class="material-icons">light_mode</i> Luci LED
+                    </button>
+                    <button id="refresh-btn" class="btn" style="background: #F3E5F5; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
+                        <i class="material-icons">refresh</i> Aggiorna
+                    </button>
+                </div>
+                
+                <h3><i class="material-icons">list_alt</i> Log Azioni</h3>
+                <div id="action-log" class="action-log"></div>
             </div>
         </div>
-    </main>
+    </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Simulazione interattiva
-        document.addEventListener('DOMContentLoaded', function() {
-            const controlCards = document.querySelectorAll('.control-card');
-            const modeButtons = document.querySelectorAll('.mode-btn');
-            
-            // Gestione click sui controlli
-            controlCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    const status = this.querySelector('.status');
-                    this.classList.toggle('active');
-                    
-                    if(this.classList.contains('active')) {
-                        status.textContent = 'ON';
-                        status.classList.remove('off');
-                    } else {
-                        status.textContent = 'OFF';
-                        status.classList.add('off');
+        // Configurazione Supabase
+        const supabaseUrl = 'https://dahrfnesfyxhtvyhzocn.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Inizializzazione grafici
+        const internalCtx = document.getElementById('internal-chart').getContext('2d');
+        const plantCtx = document.getElementById('plant-chart').getContext('2d');
+        
+        const internalChart = new Chart(internalCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Temperatura (°C)',
+                        data: [],
+                        borderColor: '#F44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        tension: 0.3,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Umidità (%)',
+                        data: [],
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        tension: 0.3,
+                        yAxisID: 'y1'
                     }
-                });
-            });
-            
-            // Gestione cambio modalità
-            modeButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    modeButtons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Qui implementeresti la logica per cambiare modalità
-                });
-            });
-            
-            // Simulazione dati ambientali
-            function simulateEnvironment() {
-                const tempElement = document.querySelector('.env-card:nth-child(1) .env-value');
-                const humidityElement = document.querySelector('.env-card:nth-child(2) .env-value');
-                const phElement = document.querySelector('.env-card:nth-child(4)');
-                
-                // Variazione casuale dei valori
-                const randomTemp = (24 + (Math.random() * 2 - 1)).toFixed(1);
-                const randomHumidity = (65 + (Math.random() * 10 - 5)).toFixed(0);
-                const randomPH = (3.2 + (Math.random() * 0.4 - 0.2)).toFixed(1);
-                
-                tempElement.textContent = `${randomTemp}°C`;
-                humidityElement.textContent = `${randomHumidity}%`;
-                phElement.querySelector('.env-value').textContent = randomPH;
-                
-                // Cambia stato in base ai valori
-                if(randomPH > 3.5) {
-                    phElement.classList.remove('warning');
-                    phElement.classList.add('optimal');
-                } else {
-                    phElement.classList.remove('optimal');
-                    phElement.classList.add('warning');
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Temperatura (°C)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Umidità (%)'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
                 }
+            }
+        });
+        
+        const plantChart = new Chart(plantCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Condizioni Ideali',
+                        data: [],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        borderDash: [5, 5],
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Condizioni Attuali',
+                        data: [],
+                        borderColor: '#FF9800',
+                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Indice Benessere'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Funzioni per aggiornare i dati
+        async function fetchAllData() {
+            await fetchSensorData();
+            await fetchWeatherData();
+            await fetchPlantData();
+            await fetchActionLog();
+            updateCurrentTime();
+        }
+        
+        async function fetchSensorData() {
+            try {
+                // Recupera ultimi 50 dati sensori
+                const { data: sensors, error } = await supabase
+                    .from('SENSORS')
+                    .select('*')
+                    .order('timestamp', { ascending: false })
+                    .limit(50);
                 
-                setTimeout(simulateEnvironment, 3000);
+                if (sensors && sensors.length > 0) {
+                    sensors.reverse(); // Ordine cronologico
+                    
+                    // Aggiorna valori correnti
+                    const last = sensors[sensors.length - 1];
+                    document.getElementById('internal-temp').innerHTML = `${last.temperature.toFixed(1)}<span class="sensor-unit">°C</span>`;
+                    document.getElementById('internal-humidity').innerHTML = `${last.humidity.toFixed(1)}<span class="sensor-unit">%</span>`;
+                    document.getElementById('internal-soil').innerHTML = `${last.soil_moisture}<span class="sensor-unit">%</span>`;
+                    document.getElementById('internal-light').innerHTML = `${last.light_level}<span class="sensor-unit">lux</span>`;
+                    
+                    // Aggiorna grafico
+                    internalChart.data.labels = sensors.map(item => new Date(item.timestamp).toLocaleTimeString());
+                    internalChart.data.datasets[0].data = sensors.map(item => item.temperature);
+                    internalChart.data.datasets[1].data = sensors.map(item => item.humidity);
+                    internalChart.update();
+                    
+                    // Aggiorna stato
+                    updateInternalStatus(last);
+                }
+            } catch (error) {
+                console.error('Error fetching sensor data:', error);
+            }
+        }
+        
+        function updateInternalStatus(sensorData) {
+            const statusElement = document.getElementById('internal-status');
+            
+            // Logica semplificata per lo stato
+            if (sensorData.temperature > 30 || sensorData.humidity > 80) {
+                statusElement.textContent = 'ATTENZIONE';
+                statusElement.className = 'status-badge status-warning';
+            } else if (sensorData.temperature < 10 || sensorData.humidity < 30) {
+                statusElement.textContent = 'CRITICO';
+                statusElement.className = 'status-badge status-danger';
+            } else {
+                statusElement.textContent = 'OK';
+                statusElement.className = 'status-badge status-ok';
+            }
+        }
+        
+        async function fetchWeatherData() {
+            try {
+                const { data: weather, error } = await supabase
+                    .from('WEATHER_DATA')
+                    .select('*')
+                    .eq('location', 'Belpasso')
+                    .order('last_update', { ascending: false })
+                    .limit(1);
+                
+                if (weather && weather[0]) {
+                    const w = weather[0].data;
+                    
+                    // Meteo corrente
+                    const current = w.current;
+                    const weatherIcon = document.querySelector('#current-weather .weather-icon');
+                    const weatherDesc = current.weather.toLowerCase();
+                    
+                    // Mappa icone meteo
+                    const iconMap = {
+                        'clear': 'wb_sunny',
+                        'clouds': 'cloud',
+                        'rain': 'umbrella',
+                        'thunderstorm': 'flash_on',
+                        'snow': 'ac_unit',
+                        'mist': 'cloud',
+                        'fog': 'cloud',
+                        'drizzle': 'grain'
+                    };
+                    
+                    weatherIcon.textContent = iconMap[weatherDesc.split(' ')[0]] || 'wb_sunny';
+                    document.querySelector('.weather-temp').textContent = `${current.temp.toFixed(1)}°C`;
+                    document.querySelector('.weather-desc').textContent = current.weather;
+                    document.getElementById('weather-humidity').textContent = `${current.humidity}%`;
+                    document.getElementById('weather-wind').textContent = `${(current.wind_speed * 3.6).toFixed(1)} km/h`;
+                    document.getElementById('weather-rain').textContent = current.rain > 0 ? current.rain.toFixed(1) : '0';
+                    
+                    // Aggiorna stato esterno
+                    const externalStatus = document.getElementById('external-status');
+                    if (current.rain > 5) {
+                        externalStatus.textContent = 'PIOGGIA';
+                        externalStatus.className = 'status-badge status-danger';
+                    } else if (current.rain > 0) {
+                        externalStatus.textContent = 'PIOGGIA LEGGERA';
+                        externalStatus.className = 'status-badge status-warning';
+                    } else {
+                        externalStatus.textContent = weatherDesc.toUpperCase();
+                        externalStatus.className = 'status-badge status-ok';
+                    }
+                    
+                    // Previsioni orarie
+                    const hourlyContainer = document.getElementById('hourly-forecast');
+                    hourlyContainer.innerHTML = w.hourly.slice(0, 12).map(h => {
+                        const time = new Date(h.time).toLocaleTimeString([], {hour: '2-digit'});
+                        return `
+                            <div class="hourly-item animate__animated animate__fadeIn">
+                                <p><strong>${time}</strong></p>
+                                <i class="material-icons">${iconMap[h.icon.split(' ')[0]] || 'wb_sunny'}</i>
+                                <p>${h.temp.toFixed(0)}°C</p>
+                                ${h.pop > 30 ? `<p><i class="material-icons" style="font-size: 1rem;">umbrella</i> ${h.pop.toFixed(0)}%</p>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // Previsioni giornaliere
+                    const dailyContainer = document.getElementById('daily-forecast');
+                    dailyContainer.innerHTML = w.daily.map(d => {
+                        const date = new Date(d.date);
+                        return `
+                            <div class="daily-item animate__animated animate__fadeIn">
+                                <p><strong>${date.toLocaleDateString([], {weekday: 'short'})}</strong></p>
+                                <i class="material-icons">${iconMap[d.icon.split(' ')[0]] || 'wb_sunny'}</i>
+                                <p>${d.temp_day.toFixed(0)}°C</p>
+                                <p>${d.temp_night.toFixed(0)}°C <i class="material-icons" style="font-size: 1rem;">dark_mode</i></p>
+                                ${d.pop > 30 ? `<p><i class="material-icons" style="font-size: 1rem;">umbrella</i> ${d.pop.toFixed(0)}%</p>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            }
+        }
+        
+        async function fetchPlantData() {
+            try {
+                // Recupera stato pianta
+                const { data: plantStatus, error } = await supabase
+                    .from('PLANT_STATUS')
+                    .select('*')
+                    .order('last_update', { ascending: false })
+                    .limit(1);
+                
+                if (plantStatus && plantStatus[0]) {
+                    const status = plantStatus[0];
+                    const badge = document.getElementById('plant-status-badge');
+                    
+                    // Aggiorna badge stato
+                    if (status.status === 'OK') {
+                        badge.textContent = 'SANO';
+                        badge.className = 'status-badge status-ok';
+                    } else if (status.status === 'ATTENZIONE') {
+                        badge.textContent = 'ATTENZIONE';
+                        badge.className = 'status-badge status-warning';
+                    } else {
+                        badge.textContent = 'CRITICO';
+                        badge.className = 'status-badge status-danger';
+                    }
+                    
+                    // Aggiorna informazioni pianta
+                    document.getElementById('plant-info').innerHTML = `
+                        <div style="text-align: center; padding: 10px;">
+                            <i class="material-icons floating" style="font-size: 3rem; color: #4CAF50;">local_florist</i>
+                            <h3>${status.plant_name}</h3>
+                            <p>Ultimo aggiornamento: ${new Date(status.last_update).toLocaleString()}</p>
+                        </div>
+                    `;
+                    
+                    // Mostra avvisi se presenti
+                    if (status.issues) {
+                        document.getElementById('plant-issues').style.display = 'block';
+                        document.getElementById('issues-list').innerHTML = `
+                            <p><i class="material-icons">warning</i> ${status.issues}</p>
+                        `;
+                    } else {
+                        document.getElementById('plant-issues').style.display = 'none';
+                    }
+                    
+                    // Aggiorna grafico pianta (dati simulati)
+                    updatePlantChart(status.plant_name);
+                }
+            } catch (error) {
+                console.error('Error fetching plant data:', error);
+            }
+        }
+        
+        function updatePlantChart(plantName) {
+            // Simula dati per il grafico
+            const labels = [];
+            const idealData = [];
+            const actualData = [];
+            
+            for (let i = 0; i < 7; i++) {
+                labels.push(`Giorno ${i + 1}`);
+                idealData.push(80 + Math.random() * 10);
+                actualData.push(60 + Math.random() * 40);
             }
             
-            simulateEnvironment();
+            plantChart.data.labels = labels;
+            plantChart.data.datasets[0].data = idealData;
+            plantChart.data.datasets[1].data = actualData;
+            plantChart.update();
+        }
+        
+        async function fetchActionLog() {
+            try {
+                const { data: actions, error } = await supabase
+                    .from('LOG')
+                    .select('*')
+                    .order('timestamp', { ascending: false })
+                    .limit(10);
+                
+                if (actions) {
+                    const logContainer = document.getElementById('action-log');
+                    logContainer.innerHTML = actions.map(action => {
+                        const date = new Date(action.timestamp);
+                        let icon = 'info';
+                        let iconColor = '';
+                        
+                        if (action.action.includes('WATER')) {
+                            icon = 'water_drop';
+                            iconColor = 'water-icon';
+                        } else if (action.action.includes('FAN')) {
+                            icon = 'air';
+                            iconColor = 'fan-icon';
+                        } else if (action.action.includes('TEMP')) {
+                            icon = 'thermostat';
+                            iconColor = 'temp-icon';
+                        }
+                        
+                        return `
+                            <div class="log-item animate__animated animate__fadeIn">
+                                <span class="log-time">${date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</span>
+                                <i class="material-icons log-icon ${iconColor}">${icon}</i>
+                                <span class="log-message">${action.action.replace(/_/g, ' ')}</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Error fetching action log:', error);
+            }
+        }
+        
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        
+        // Gestione pulsanti
+        document.getElementById('refresh-btn').addEventListener('click', fetchAllData);
+        
+        document.getElementById('water-btn').addEventListener('click', async () => {
+            // Simula invio comando irrigazione
+            const { error } = await supabase
+                .from('LOG')
+                .insert([{ action: 'MANUAL_WATER_ON', timestamp: new Date().toISOString() }]);
+            
+            if (!error) {
+                fetchActionLog();
+                // Aggiungi animazione
+                const btn = document.getElementById('water-btn');
+                btn.classList.add('animate__animated', 'animate__pulse');
+                setTimeout(() => {
+                    btn.classList.remove('animate__animated', 'animate__pulse');
+                }, 1000);
+            }
         });
+        
+        // Carica i dati iniziali
+        fetchAllData();
+        
+        // Aggiorna i dati ogni 30 secondi
+        setInterval(fetchAllData, 30000);
+        // Aggiorna l'orario ogni secondo
+        setInterval(updateCurrentTime, 1000);
     </script>
 </body>
 </html>
