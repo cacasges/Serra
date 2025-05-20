@@ -934,6 +934,56 @@
             }
         }
 
+        /* Stili per l'upload dei file */
+        .file-upload-btn {
+            background: var(--primary-light);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .file-upload-btn {
+                width: 48px;
+                height: 48px;
+            }
+        }
+
+        .file-upload-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .file-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 0.8rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .file-message {
+            background: #E3F2FD;
+            border-radius: 0.8rem;
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .file-icon {
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
         /* Loading spinner */
         .loading-spinner {
             display: inline-block;
@@ -1042,6 +1092,33 @@
                 
                 <div class="chart-container">
                     <canvas id="internal-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Chatbot Serra (SPOSTATO PRIMA DEL METEO) -->
+            <div class="chatbot-container">
+                <div class="chatbot-header">
+                    <span class="material-icons-round chatbot-icon">psychology</span>
+                    <h3 class="chatbot-title">Assistente Serra Intelligente</h3>
+                </div>
+                
+                <div class="chatbot-messages" id="chatbot-messages">
+                    <div class="message bot-message">
+                        🌿 Ciao! Sono la tua Serra Intelligente. Come posso aiutarti oggi? Posso darti consigli sulle tue piante, sull'ambiente della serra o sull'automazione dei sistemi!
+                    </div>
+                </div>
+                
+                <div class="chatbot-input">
+                    <div style="display: flex; width: 100%; gap: 0.5rem;">
+                        <label for="file-upload" class="file-upload-btn" title="Allega file">
+                            <span class="material-icons-round">attach_file</span>
+                            <input type="file" id="file-upload" style="display: none;" accept="image/*,.pdf,.doc,.docx,.txt">
+                        </label>
+                        <input type="text" id="chatbot-input" placeholder="Scrivi il tuo messaggio..." autocomplete="off" style="flex-grow: 1;">
+                        <button id="chatbot-send">
+                            <span class="material-icons-round">send</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -1177,27 +1254,6 @@
                         <span class="material-icons-round log-icon log-light">light_mode</span>
                         <span class="log-message">Luci LED accese</span>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Chatbot Serra -->
-            <div class="chatbot-container">
-                <div class="chatbot-header">
-                    <span class="material-icons-round chatbot-icon">psychology</span>
-                    <h3 class="chatbot-title">Assistente Serra Intelligente</h3>
-                </div>
-                
-                <div class="chatbot-messages" id="chatbot-messages">
-                    <div class="message bot-message">
-                        🌿 Ciao! Sono la tua Serra Intelligente. Come posso aiutarti oggi? Posso darti consigli sulle tue piante, sull'ambiente della serra o sull'automazione dei sistemi!
-                    </div>
-                </div>
-                
-                <div class="chatbot-input">
-                    <input type="text" id="chatbot-input" placeholder="Scrivi il tuo messaggio..." autocomplete="off">
-                    <button id="chatbot-send">
-                        <span class="material-icons-round">send</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -1680,6 +1736,113 @@
             }
             
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Gestione upload file
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const messagesContainer = document.getElementById('chatbot-messages');
+            
+            if (file.type.startsWith('image/')) {
+                // Se è un'immagine, mostra l'anteprima
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    messagesContainer.innerHTML += `
+                        <div class="message user-message">
+                            <img src="${event.target.result}" class="file-preview" alt="Immagine inviata">
+                        </div>
+                    `;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // Aggiungi al contesto della chat
+                    chatHistory.push({ 
+                        role: "user", 
+                        content: "Ho inviato un'immagine: " + file.name,
+                        image: event.target.result 
+                    });
+                    
+                    // Invia automaticamente una richiesta di analisi
+                    setTimeout(() => {
+                        addBotMessage("📷 Ho ricevuto la tua immagine. Sto analizzando il contenuto...");
+                        analyzeImage(event.target.result);
+                    }, 1000);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Se è un file generico
+                messagesContainer.innerHTML += `
+                    <div class="message user-message">
+                        <div class="file-message">
+                            <span class="material-icons-round file-icon">description</span>
+                            ${file.name} (${(file.size / 1024).toFixed(1)} KB)
+                        </div>
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Aggiungi al contesto della chat
+                chatHistory.push({ 
+                    role: "user", 
+                    content: "Ho inviato un file: " + file.name 
+                });
+                
+                // Invia automaticamente una richiesta di analisi
+                setTimeout(() => {
+                    addBotMessage("📄 Ho ricevuto il tuo file. Purtroppo posso solo leggere il nome del file, non il contenuto.");
+                }, 1000);
+            }
+            
+            // Resetta l'input del file
+            e.target.value = '';
+        });
+
+        // Funzione per analizzare le immagini (simulata)
+        async function analyzeImage(imageData) {
+            try {
+                // Mostra indicatori di caricamento
+                const loadingId = 'loading-' + Date.now();
+                const messagesContainer = document.getElementById('chatbot-messages');
+                messagesContainer.innerHTML += `
+                    <div id="${loadingId}" class="message bot-message">
+                        <span class="loading-spinner"></span>
+                        Sto analizzando l'immagine...
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Simula un ritardo di analisi
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Risposta simulata (nella realtà dovresti usare un'API di visione artificiale)
+                const responses = [
+                    "🌿 Nell'immagine riconosco delle piante verdi che sembrano in buona salute. Le foglie hanno un colore vivace e non mostrano segni di malattie evidenti.",
+                    "⚠️ Noto alcune foglie con bordi ingialliti. Potrebbe essere un segno di eccesso d'acqua o carenza di nutrienti. Consiglio di controllare l'umidità del terreno.",
+                    "🔍 L'immagine mostra una pianta con foglie rigogliose. Il terreno sembra leggermente umido, il che è ottimo per la maggior parte delle piante.",
+                    "🌸 Riconosco dei fiori nella tua immagine! Sembrano essere in fase di fioritura. Ricorda di mantenere un'umidità costante in questo periodo.",
+                    "🍅 Nella foto vedo dei pomodori in crescita! I frutti sembrano sani, ma controlla che non ci siano macchie sulle foglie."
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                // Sostituisci il messaggio di caricamento con la risposta
+                document.getElementById(loadingId).outerHTML = `
+                    <div class="message bot-message">
+                        ${randomResponse}
+                    </div>
+                `;
+                
+                // Aggiungi al contesto della chat
+                chatHistory.push({ 
+                    role: "assistant", 
+                    content: randomResponse 
+                });
+                
+            } catch (error) {
+                console.error("Errore nell'analisi dell'immagine:", error);
+                addBotMessage("⚠️ Si è verificato un errore durante l'analisi dell'immagine. Riprova più tardi.");
+            }
         }
         
         // Simula dati sensori in tempo reale
